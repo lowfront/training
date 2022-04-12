@@ -14,3 +14,6 @@ fetch(`<endpoint>`, {
 ```
 
 `serverless-dotenv-plugin` 플러그인 테스트 -> 작동하지 않음
+[링크](https://github.com/neverendingqs/serverless-dotenv-plugin/discussions/155)에 따르면 serverless 3.0.0 이상 버전은 해당 플러그인을 지원하지 않는다고 함. 일단 네이티브와 스크립트로 환경변수를 사용해야 할 듯.
+
+[링크](https://www.serverless.com/framework/docs/guides/dashboard#supported-runtimes-and-regions)에 따르면 현재 서울(ap-northeast-2) 지역은 serverless의 대쉬보드 기능을 지원하지 않음.
