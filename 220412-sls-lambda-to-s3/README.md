@@ -12,3 +12,5 @@ fetch(`<endpoint>`, {
   method: 'POST',
 });
 ```
+
+`serverless-dotenv-plugin` 플러그인 테스트 -> 작동하지 않음
