@@ -1,6 +1,6 @@
 # serverless 라이브러리 AWS Nodejs 테스트
 
-service-lambda-to-s3 버킷은 수동으로 생성해야 함.
+serverless 라이브러리는 lambda의 업로드 대상이 되는 s3 버킷 생성기능은 없음. service-lambda-to-s3 버킷은 수동으로 생성해야 함.
 
 ```
 sls deploy
