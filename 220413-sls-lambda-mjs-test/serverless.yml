@@ -1,3 +1,5 @@
+org: lowfront
+app: lts-test
 # Welcome to Serverless!
 #
 # This file is the main config file for your service.
@@ -18,7 +20,7 @@ frameworkVersion: '3'
 provider:
   name: aws
   runtime: nodejs14.x
-  region: ap-northeast-2
+  region: ap-northeast-1
   stage: ${env:STAGE, 'dev'}
 
 # you can add statements to the Lambda function's IAM Role here
