@@ -12,8 +12,6 @@
 # Happy Coding!
 
 service: service-lambda-to-s3
-plugins:
-  - serverless-dotenv-plugin
 
 frameworkVersion: '3'
 
