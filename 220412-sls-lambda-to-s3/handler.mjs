@@ -4,7 +4,7 @@ import { nanoid } from 'nanoid';
 
 const S3 = new AWS.S3();
 
-export async function save(event) {
+export async function route(event) {
   await S3.putObject({
     Bucket: "service-lambda-to-s3",
     Key: nanoid(),

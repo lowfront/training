@@ -32,12 +32,18 @@ provider:
             - "arn:aws:s3:::service-lambda-to-s3/*"
 
 functions:
-  route:
-    handler: handler.route
+  route1:
+    handler: handler.route1
     events:
       - httpApi:
           method: POST
-          path: /
+          path: /route1
+  route2:
+    handler: handler.route2
+    events:
+      - httpApi:
+          method: POST
+          path: /route2
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
