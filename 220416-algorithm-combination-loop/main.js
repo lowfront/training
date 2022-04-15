@@ -1,21 +1,21 @@
 function* combination(array, n) {
-  const result = [];
-
   for (let i = 0; i < array.length - n + 1; i++) {
-      const stack = [[[array[i]], array.slice(i + 1)]];
-      while (stack.length) {
-          const [comb, rest] = stack.shift();
-          if (comb.length === n) {
-              yield comb;
-              continue;
-          }
-          rest.forEach((item, i) => {
-              if (!rest.length) return;
-              const newRest = rest.slice(i + 1);
-              stack.push([[...comb, item], newRest]);
-          });
+    const stack = [[[array[i]], array.slice(i + 1)]];
+    while (stack.length) {
+      const [comb, rest] = stack.shift();
+      
+      for (let i = 0; i < rest.length; i++) {
+        const newComb = [...comb, rest[i]];
+        if (newComb.length === n) {
+          yield newComb;
+          continue;
+        } else {
+          const newRest = rest.slice(i + 1);
+          stack.push([newComb, newRest]);
+        }
       }
+    }
   }
 }
 iter = combination([1, 2, 3, 4], 3);
-[...iter]
+[...iter];
