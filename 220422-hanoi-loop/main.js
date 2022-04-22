@@ -1,10 +1,14 @@
 const PLAN_TYPE = Symbol('plan');
 const MOVE_TYPE = Symbol('move');
 
-const pillars = [0, 1, 2];
+const pillarMap = {
+  1: 2, // 0 + 1
+  3: 0, // 1 + 2
+  2: 1, // 2 + 0
+};
 
-function getWaypoint(startAndEnd) {
-  return pillars.findIndex(n => !startAndEnd.includes(n));
+function getWaypoint(start, end) {
+  return pillarMap[start + end];
 }
 
 function* hanoi(plateLength, start, end) {
@@ -13,7 +17,7 @@ function* hanoi(plateLength, start, end) {
   let target;
   while (target = stack.shift()) {
     const [type, no, start, end] = target;
-    const waypoint = getWaypoint([start, end]);
+    const waypoint = getWaypoint(start, end);
     switch (type) {
     case PLAN_TYPE:
       if (no === 1) stack.unshift([MOVE_TYPE, no, start, end]);
@@ -65,6 +69,5 @@ for (const [no, start, end] of hanoi(5, 0, 1)) console.log(`${no}번 원판을 $
       2 -> 1
       1 : 2 -> 1
         1 -> 1
-      
-        
+...
 */
