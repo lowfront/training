@@ -20,7 +20,6 @@ function* combination(array, n) {
     for (const item of array) yield [item];
     return;
   }
-  const result = [];
 
   for (let i = 0; i < array.length - n + 1; i++) {
     const stack = [[[array[i]], array.slice(i + 1)]];
