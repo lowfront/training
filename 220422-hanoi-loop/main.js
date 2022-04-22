@@ -14,21 +14,25 @@ function* hanoi(plateLength, start, end) {
   while (target = stack.shift()) {
     const [type, no, start, end] = target;
     const waypoint = getWaypoint([start, end]);
-    if (type === PLAN_TYPE) {
+    switch (type) {
+    case PLAN_TYPE:
       if (no === 1) stack.unshift([MOVE_TYPE, no, start, end]);
       else stack.unshift(
         [PLAN_TYPE, no - 1, start, waypoint],
         [MOVE_TYPE, no, start, end],
-        [PLAN_TYPE, no - 1, waypoint, end]
+        [PLAN_TYPE, no - 1, waypoint, end],
       );
-    } else if (type === MOVE_TYPE) {
+      break;
+    case MOVE_TYPE:
       yield [no, start, end];
-    } else {
+      break;
+    default:
       throw new Error('Invalid process...');
     }
   }
 }
-[...hanoi(5, 0, 1)];
+for (const [no, start, end] of hanoi(5, 0, 1)) console.log(`${no}번 원판을 ${start + 1}번 기둥에서 ${end + 1}번 기둥으로 이동`);
+
 /*
 필요한 공간 : 현재 위치, 경유 위치, 목표 위치
 4 : 0 -> 1 // 완성되어있는 탑 기준으로 시작, n : a -> b = n번 원판을 a에서 b로 옮길 예정, n -> a = n번 원판을 a로 이동
