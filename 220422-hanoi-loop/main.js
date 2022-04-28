@@ -31,7 +31,7 @@ function* hanoi(plateLength, start, end) {
       yield [no, start, end];
       break;
     default:
-      throw new Error('Invalid process...');
+      throw new Error('Never Appear');
     }
   }
 }
