@@ -128,4 +128,6 @@ const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
   // const mergeSortedArray = mergeSort(Array.from(Array(101), () => Math.floor(Math.random() * 1000)));
   // console.log('mergeSortedArray', mergeSortedArray);
+  const quickSortedArray = quickSort(Array.from(Array(100000), () => Math.floor(Math.random() * 100000)));
+  console.log('quickSortedArray', quickSortedArray);
 })();
