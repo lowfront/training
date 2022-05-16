@@ -126,8 +126,18 @@ const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
   // }
   // console.log(array)
 
-  // const mergeSortedArray = mergeSort(Array.from(Array(101), () => Math.floor(Math.random() * 1000)));
+  // const arr0 = Array.from(Array(100000), () => Math.floor(Math.random() * 100000));
+  // console.time('merge sort');
+  // const mergeSortedArray = mergeSort(arr0);
+  // console.timeEnd('merge sort');
   // console.log('mergeSortedArray', mergeSortedArray);
-  const quickSortedArray = quickSort(Array.from(Array(100000), () => Math.floor(Math.random() * 100000)));
+  const arr1 = Array.from(Array(100000), () => Math.floor(Math.random() * 100000));
+  console.time('quick sort');
+  const quickSortedArray = quickSort(arr1);
+  console.timeEnd('quick sort');
+  const arr2 = Array.from(Array(100000), () => Math.floor(Math.random() * 100000));
+  console.time('native sort');
+  arr2.sort();
+  console.timeEnd('native sort');
   console.log('quickSortedArray', quickSortedArray);
 })();
