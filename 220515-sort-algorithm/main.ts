@@ -115,6 +115,37 @@ function quickSort(array: number[]) {
   }
 }
 
+function quickSortinPlace(array: number[]) {
+  const stack: [number, number][] = [[0, array.length - 1]];
+  let target: [number, number];
+  let temp: number;
+  while (target = stack.shift()) {
+    const [firstIndex, lastIndex] = target;
+
+    const middleIndex = Math.floor((firstIndex + lastIndex) / 2);
+
+    const pivot = array[middleIndex];
+    let leftIndex = firstIndex;
+    let rightIndex = lastIndex;
+
+    while (leftIndex <= rightIndex) {
+      while (pivot > array[leftIndex]) leftIndex++;
+      while (pivot < array[rightIndex]) rightIndex--;
+
+      if (leftIndex >= rightIndex) break;
+      temp = array[leftIndex];
+      array[leftIndex] = array[rightIndex];
+      array[rightIndex] = temp;
+      leftIndex++;
+      rightIndex--;
+    }
+    const nextMiddleIndex = leftIndex - 1;
+    if (nextMiddleIndex - firstIndex > 1) stack.push([firstIndex, nextMiddleIndex]);
+    if (lastIndex - leftIndex > 1) stack.push([leftIndex, lastIndex]);
+  }
+  return array;
+}
+
 const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 (async () => {
@@ -131,13 +162,18 @@ const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
   // const mergeSortedArray = mergeSort(arr0);
   // console.timeEnd('merge sort');
   // console.log('mergeSortedArray', mergeSortedArray);
+  const arr3 = Array.from(Array(100000), () => Math.floor(Math.random() * 100000));
+  console.time('native sort');
+  arr3.sort();
+  console.timeEnd('native sort');
   const arr1 = Array.from(Array(100000), () => Math.floor(Math.random() * 100000));
   console.time('quick sort');
   const quickSortedArray = quickSort(arr1);
   console.timeEnd('quick sort');
   const arr2 = Array.from(Array(100000), () => Math.floor(Math.random() * 100000));
-  console.time('native sort');
-  arr2.sort();
-  console.timeEnd('native sort');
-  console.log('quickSortedArray', quickSortedArray);
+  console.time('quick sort in place');
+  const quickSortinPlaceArray = quickSortinPlace(arr2);
+  console.timeEnd('quick sort in place');
+  // console.log('quickSortedArray', quickSortedArray);
+  console.log('quickSortInPlaceArray', quickSortinPlaceArray);
 })();
