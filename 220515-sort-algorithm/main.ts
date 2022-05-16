@@ -35,7 +35,16 @@ function* bubbleSort(array: Uint32Array) {
 }
 
 function mergeSort(array: number[]) {
-  const stack: number[][] = [...array].map(n => [n]);
+  const stack: number[][] = [];
+
+  for (let i = 0; i < array.length; i += 2) {
+    if (array[i + 1] === undefined) {
+      stack.push([array[i]]);
+      break;
+    }
+    else if (array[i] < array[i + 1]) stack.push([array[i], array[i + 1]])
+    else stack.push([array[i + 1], array[i]])
+  }
 
   while (1) {
     const nextStackItem = [];
@@ -71,7 +80,7 @@ const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
   //   await sleep(0);
   // }
   // console.log(array)
-  
-  const mergeSortedArray = mergeSort(Array.from(Array(1000), () => Math.floor(Math.random() * 1000)));
-  console.log(mergeSortedArray);
+
+  const mergeSortedArray = mergeSort(Array.from(Array(101), () => Math.floor(Math.random() * 1000)));
+  console.log('mergeSortedArray', mergeSortedArray);
 })();
