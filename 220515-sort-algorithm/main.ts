@@ -146,6 +146,22 @@ function quickSortinPlace(array: number[]) {
   return array;
 }
 
+function insertionSort(array: number[]) {
+  let temp: number;
+  for (let i = 1; i < array.length; i++) {
+    temp = array[i];
+    console.log('temp', array, i, temp);
+    let leftIndex = i - 1;
+    while (leftIndex >= 0 && temp < array[leftIndex]) {
+      array[leftIndex + 1] = array[leftIndex];
+      leftIndex--;
+    }
+    array[leftIndex + 1] = temp;
+  }
+
+  return array;
+}
+
 const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 (async () => {
@@ -162,9 +178,9 @@ const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
   // const mergeSortedArray = mergeSort(arr0);
   // console.timeEnd('merge sort');
   // console.log('mergeSortedArray', mergeSortedArray);
-  const arr3 = Array.from(Array(100000), () => Math.floor(Math.random() * 100000));
+  const arr0 = Array.from(Array(100000), () => Math.floor(Math.random() * 100000));
   console.time('native sort');
-  arr3.sort();
+  arr0.sort();
   console.timeEnd('native sort');
   const arr1 = Array.from(Array(100000), () => Math.floor(Math.random() * 100000));
   console.time('quick sort');
@@ -174,6 +190,9 @@ const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
   console.time('quick sort in place');
   const quickSortinPlaceArray = quickSortinPlace(arr2);
   console.timeEnd('quick sort in place');
+  console.time('insertion sort');
+  const arr3 = Array.from(Array(100000), () => Math.floor(Math.random() * 100000));
+  console.timeEnd('insertion sort');
   // console.log('quickSortedArray', quickSortedArray);
   console.log('quickSortInPlaceArray', quickSortinPlaceArray);
 })();
