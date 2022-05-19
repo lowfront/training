@@ -150,7 +150,6 @@ function insertionSort(array: number[]) {
   let temp: number;
   for (let i = 1; i < array.length; i++) {
     temp = array[i];
-    console.log('temp', array, i, temp);
     let leftIndex = i - 1;
     while (leftIndex >= 0 && temp < array[leftIndex]) {
       array[leftIndex + 1] = array[leftIndex];
@@ -160,6 +159,43 @@ function insertionSort(array: number[]) {
   }
 
   return array;
+}
+
+function heapSort(heap: number[]) {
+  let temp: number;
+  for(let i = 1; i < heap.length; i++) {
+      let c = i;
+      do {
+          let root = Math.floor((c - 1) / 2);
+          if (heap[root] < heap[c]) {
+              temp = heap[root];
+              heap[root] = heap[c];
+              heap[c] = temp;
+          }
+          c = root;
+      } while (c);
+  }
+  for (let i = heap.length - 1; i >= 0; i--) {
+      temp = heap[0];
+      heap[0] = heap[i];
+      heap[i] = temp;
+      let root = 0;
+      let c = 1;
+      do {
+          c = 2 * root + 1;
+          if (heap[c] < heap[c + 1] && c < i - 1) {
+              c++;
+          }
+          if (heap[root] < heap[c] && c < i) {
+              temp = heap[root];
+              heap[root] = heap[c];
+              heap[c] = temp;
+          }
+          root = c;
+      } while (c < i);
+  }
+
+  return heap;
 }
 
 const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
@@ -184,15 +220,19 @@ const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
   console.timeEnd('native sort');
   const arr1 = Array.from(Array(100000), () => Math.floor(Math.random() * 100000));
   console.time('quick sort');
-  const quickSortedArray = quickSort(arr1);
+  quickSort(arr1);
   console.timeEnd('quick sort');
   const arr2 = Array.from(Array(100000), () => Math.floor(Math.random() * 100000));
   console.time('quick sort in place');
-  const quickSortinPlaceArray = quickSortinPlace(arr2);
+  quickSortinPlace(arr2);
   console.timeEnd('quick sort in place');
-  console.time('insertion sort');
   const arr3 = Array.from(Array(100000), () => Math.floor(Math.random() * 100000));
-  console.timeEnd('insertion sort');
-  // console.log('quickSortedArray', quickSortedArray);
-  console.log('quickSortInPlaceArray', quickSortinPlaceArray);
+  // console.time('insertion sort');
+  // insertionSort(arr3);
+  // console.timeEnd('insertion sort');
+  const arr4 = Array.from(Array(100000), () => Math.floor(Math.random() * 100000));
+  console.time('heap sort');
+  heapSort(arr4);
+  console.timeEnd('heap sort');
+
 })();
