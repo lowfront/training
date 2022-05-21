@@ -1,0 +1,21 @@
+body {
+  margin: 0;
+  box-sizing: border-box;
+  position: relative;
+  /* Ensure content is at least as large as the screen height */
+  min-height: 100vh;
+}
+footer {
+  /* Setting the margin between the footer and the content */
+  height: 60px;
+}
+
+footer .bottom {
+  /* Actual Footer Content Fixed at Bottom */
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 50px;
+  background: black;
+  color: white;
+}
