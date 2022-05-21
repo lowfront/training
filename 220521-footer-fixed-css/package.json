@@ -1,0 +1,14 @@
+{
+  "name": "fixed-footer-layout-used-by-google",
+  "version": "1.0.0",
+  "description": "Fixed layout at the bottom of the footer used on the Google search page",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": {
+    "name": "lowfront",
+    "email": "lowfronterior@gmail.com"
+  },
+  "license": "MIT"
+}
