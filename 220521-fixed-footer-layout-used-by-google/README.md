@@ -1,5 +1,7 @@
 # Fixed Footer Layout used By Google
 
+[Example](https://lowfront.github.io/training/fixed-footer-layout-used-by-google)
+
 This is the fixed layout of the footer used on the Google search page. The problem that is easily encountered in the footer layout is that if there is less content, it sticks to the bottom of the content and shows the space under the footer. Even if the content is sufficiently filled, the content may be reduced according to the browser's enlargement ratio. So if you simply place the footer statically under the content, there can be a space under the footer.
 
 The Google Search page uses certain CSS rules to handle the footer to be pinned to the bottom of the screen regardless of content content.
