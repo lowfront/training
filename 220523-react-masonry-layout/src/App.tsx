@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import logo from './logo.svg'
 import './App.css'
-import Masonry from './Masonry'
-import MasonryBox from './MasonryBox'
+import Masonry from './masonry/Masonry'
+import MasonryBox from './masonry/MasonryBox'
 
 function App() {
   const [count, setCount] = useState(0)
