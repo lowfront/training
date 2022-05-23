@@ -1,11 +1,20 @@
 import { Children, cloneElement, FC, PropsWithChildren, ReactElement, useEffect, useMemo, useRef, useState } from "react";
 import { debounce } from "./utils";
 
+export type Boxes = {
+  [key: string]: {
+    height?: number;
+    columns?: number;
+    left?: number;
+    top?: number;
+  }
+}
+
 const Masonry: FC<PropsWithChildren<{}
 >> = ({ children }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const container = useMemo(() => containerRef.current, [containerRef]);
-  let boxes: { [key: string]: any; } = {};
+  let boxes: Boxes = {};
 
   // [init]
   // resize eventlistener
@@ -17,18 +26,21 @@ const Masonry: FC<PropsWithChildren<{}
   useEffect(() => {
     if (!container) return;
 
+    const boxes: Boxes = {};
+
     let needUpdate = false;
     for (const child of container.children) {
       const childClientHeight = child.clientHeight;
-      const { key, preinit, columns } = (child as HTMLElement).dataset;
-      const targetBox = boxes[key as string];
+      const { key, preinit, columns } = (child as HTMLElement).dataset as { [key: string]: string; };
+      if (!key) throw new Error('There should be a key prop.');
+      const targetBox = boxes[key];
 
       // 초기 계산 끝난 후 변화 없으면 continue
       if (!preinit &&
       targetBox.height === childClientHeight &&
-      targetBox.columns === +(columns as string)) continue;
+      targetBox.columns === +(columns ?? 1)) continue;
       else {
-        boxes[key as string] = {
+        boxes[key] = {
           height: childClientHeight,
         };
         needUpdate = true;
@@ -52,9 +64,13 @@ const Masonry: FC<PropsWithChildren<{}
     return Math.max(1, Math.round(containerWidth / 300));
   }, [containerRef, container]);
 
-  const setBoxPositions = (props: typeof boxes) => {
-    const heights: number[] = [];
+  const setBoxPositions = (boxes: Boxes) => {
+    if (!container) return;
+    const heights: number[] = Array(columns).fill(0);
 
+    for (const child of container.children) {
+      const key = (child as HTMLElement).dataset
+    }
   };
 
   const computedChildren = Children.map(children as ReactElement, (el: ReactElement, i) => {
