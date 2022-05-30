@@ -11,6 +11,7 @@ document.getElementById('root').appendChild(editor);
 document.getElementById('root').appendChild(cursor);
 
 const editHandler = (ev: Event) => {
+  console.log('input', ev)
   const target = ev.target as HTMLDivElement;
   const selection = window.getSelection() as Selection;
   
@@ -73,4 +74,40 @@ const getLines = (rootNode: Node) => {
   return [...rootNode.childNodes].map(getTextNodesByRoot);
 };
 
-editor.addEventListener('input', editHandler);
+const startFragment = '<!--StartFragment-->';
+const endFragment = '<!--EndFragment-->';
+
+const pasteHandler = (ev: ClipboardEvent) => {
+  console.log('paste', ev);
+  const target = ev.target as HTMLDivElement;
+  const htmlData = ev.clipboardData.getData('text/html');
+  const startIndex = htmlData.indexOf(startFragment) + startFragment.length;
+  const endIndex = htmlData.indexOf(endFragment);
+  const docFrag = document.createDocumentFragment();
+  const wrap = document.createElement('div');
+  wrap.innerHTML = htmlData.slice(startIndex, endIndex);
+  docFrag.append(...wrap.childNodes);
+  
+
+};
+
+const debounce = <T extends any[]>(f: (...args: T) => void, ms: number) => {
+  let timer: number;
+  return  (...args: T) => {
+    clearTimeout(timer);
+    timer = setTimeout((args: T) => f(...args), ms, args);
+  };
+};
+
+// editor.addEventListener('input', debounce(editHandler, 100));
+editor.addEventListener('paste', pasteHandler);
+
+/*
+<div>
+  <div>A</div>
+  B
+</div>
+
+<div>A</div>
+<div>B</div>
+*/
