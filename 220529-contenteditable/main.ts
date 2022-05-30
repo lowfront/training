@@ -15,11 +15,17 @@ const editHandler = (ev: Event) => {
   const target = ev.target as HTMLDivElement;
   const selection = window.getSelection() as Selection;
   
-  const anchorOffset = selection.anchorOffset ?? 0;
+  if (target.childNodes.length === 1 && target.firstElementChild.tagName === 'br') {
+    console.log('br');
+    target.removeChild(target.firstElementChild);
+  } // 붙여넣기시 br 자식 생기는 버그
 
-  cursor.innerText = '' + anchorOffset;
+  // const anchorOffset = selection.anchorOffset ?? 0;
 
-  if (target.firstChild.nodeType === 3) wrapTextNode(target);
+  // cursor.innerText = '' + anchorOffset;
+
+
+  // if (target.firstChild.nodeType === 3) wrapTextNode(target);
   
 
   const lines = getLines(target);
@@ -80,6 +86,7 @@ const endFragment = '<!--EndFragment-->';
 const blockTags = ['DIV', 'P', 'SECTION', 'MAIN', 'ARTICLE'];
 
 const pasteHandler = (ev: ClipboardEvent) => {
+  ev.preventDefault();
   console.log('paste', ev);
   const htmlData = ev.clipboardData.getData('text/html');
   const startIndex = htmlData.indexOf(startFragment) + startFragment.length;
@@ -92,14 +99,23 @@ const pasteHandler = (ev: ClipboardEvent) => {
   
   while (target = stack.shift()) {
     if (target.nodeType === 1 && blockTags.includes((target as HTMLElement).tagName)) {
-      result.push([]);
+      result[result.length - 1].length && result.push([]);
       stack.unshift(...target.childNodes);
     } else {
-      result[result.length - 1].push(target);
-      // console.log('target', target);
+      result[result.length - 1].push(Object.assign(target, {style: ''}));
     }
   }
   console.log(result);
+
+  let resultHTML = '';
+  for (const nodes of result) {
+    const div = document.createElement('div');
+    for (const node of nodes) div.appendChild(node);
+    resultHTML += div.outerHTML;
+  }
+  // console.log(resultHTML);
+  // (ev.target as HTMLElement).innerHTML = '';
+  (ev.target as HTMLElement).innerHTML = resultHTML;
 };
 
 const debounce = <T extends any[]>(f: (...args: T) => void, ms: number) => {
