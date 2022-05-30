@@ -77,18 +77,29 @@ const getLines = (rootNode: Node) => {
 const startFragment = '<!--StartFragment-->';
 const endFragment = '<!--EndFragment-->';
 
+const blockTags = ['DIV', 'P', 'SECTION', 'MAIN', 'ARTICLE'];
+
 const pasteHandler = (ev: ClipboardEvent) => {
   console.log('paste', ev);
-  const target = ev.target as HTMLDivElement;
   const htmlData = ev.clipboardData.getData('text/html');
   const startIndex = htmlData.indexOf(startFragment) + startFragment.length;
   const endIndex = htmlData.indexOf(endFragment);
-  const docFrag = document.createDocumentFragment();
   const wrap = document.createElement('div');
   wrap.innerHTML = htmlData.slice(startIndex, endIndex);
-  docFrag.append(...wrap.childNodes);
+  const stack = [...wrap.childNodes];
+  const result = [[]];
+  let target: ChildNode;
   
-
+  while (target = stack.shift()) {
+    if (target.nodeType === 1 && blockTags.includes((target as HTMLElement).tagName)) {
+      result.push([]);
+      stack.unshift(...target.childNodes);
+    } else {
+      result[result.length - 1].push(target);
+      // console.log('target', target);
+    }
+  }
+  console.log(result);
 };
 
 const debounce = <T extends any[]>(f: (...args: T) => void, ms: number) => {
