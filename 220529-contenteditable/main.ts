@@ -59,24 +59,6 @@ const getTextNodesByRoot = (rootNode: Node) => {
 };
 
 const getLines = (rootNode: Node) => {
-  // const spreadNodes: Node[] = [];
-  
-  // const childNodes = [...rootNode.childNodes];
-  // let nodeStartIndex = -1;
-  // let divStartIndex = -1;
-  // for (let i = 0; i < childNodes.length; i++) {
-  //   const node = childNodes[i] as HTMLElement;
-  //   if (node.tagName === 'DIV') {
-  //     if (divStartIndex === -1) divStartIndex = i;
-  //   } else if (nodeStartIndex === -1) {
-  //     nodeStartIndex = i;
-  //   }
-
-  //   if (divStartIndex !== -1 && nodeStartIndex !== -1) break;
-  // }
-  // console.log('nodeStartIndex', nodeStartIndex);
-  // console.log('divStartIndex', divStartIndex);
-
   return [...rootNode.childNodes].map(getTextNodesByRoot);
 };
 
