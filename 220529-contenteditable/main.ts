@@ -93,14 +93,52 @@ const pasteHandler = (ev: ClipboardEvent) => {
   const endIndex = htmlData.indexOf(endFragment);
   const wrap = document.createElement('div');
   wrap.innerHTML = htmlData.slice(startIndex, endIndex);
-  const stack = [...wrap.childNodes];
+  type StackItem =
+  | {
+    type: 'text',
+    node: Node;
+    i: boolean;
+    u: boolean;
+    b: boolean;
+    block: boolean;
+    color: string;
+  } 
+  | {
+    type: 'group',
+    node: Node;
+    i: boolean;
+    u: boolean;
+    b: boolean;
+    block: boolean;
+    color: string;
+  };
+  function nodeToStackItem(node: Node, parentStackItem: StackItem|Partial<StackItem> = {}) {
+    const block = blockTags.includes((node as HTMLElement).tagName);
+
+    return {
+      type: node.nodeType === 1 ? 'group' : 'text',
+      node,
+      i: parentStackItem.i ?? false,
+      u: parentStackItem.u ?? false,
+      b: parentStackItem.b ?? false,
+      block,
+      color: (node as HTMLElement).style?.color ?? (parentStackItem.color ?? ''),
+    } as StackItem;
+  }
+  const stack: StackItem[] = [...wrap.childNodes].map(node => nodeToStackItem(node));
   const result = [[]];
-  let target: ChildNode;
+  let target: StackItem;
   
   while (target = stack.shift()) {
-    if (target.nodeType === 1 && blockTags.includes((target as HTMLElement).tagName)) {
-      result[result.length - 1].length && result.push([]);
-      stack.unshift(...target.childNodes);
+    const { node } = target;
+    if (node.nodeType === 1) {
+      if (target.block && result[result.length - 1].length) result.push([]);
+      
+      
+      const items = [...node.childNodes].map(nodeChild => {
+        return nodeToStackItem(nodeChild, target);
+      });
+      stack.unshift(...items);
     } else {
       result[result.length - 1].push(Object.assign(target, {style: ''}));
     }
@@ -108,9 +146,13 @@ const pasteHandler = (ev: ClipboardEvent) => {
   console.log(result);
 
   let resultHTML = '';
-  for (const nodes of result) {
+  for (const item of result) {
     const div = document.createElement('div');
-    for (const node of nodes) div.appendChild(node);
+    for (const { node, color } of item) {
+      const span = Object.assign(document.createElement('span'), { style: `color: ${color}` });
+      span.appendChild(node);
+      div.appendChild(span);
+    }
     resultHTML += div.outerHTML;
   }
   // console.log(resultHTML);
