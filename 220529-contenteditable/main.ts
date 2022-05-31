@@ -15,10 +15,7 @@ const editHandler = (ev: Event) => {
   const target = ev.target as HTMLDivElement;
   const selection = window.getSelection() as Selection;
   
-  // if (target.childNodes.length === 1 && target.firstElementChild.tagName === 'br') {
-  //   console.log('br');
-  //   target.removeChild(target.firstElementChild);
-  // } // 붙여넣기시 br 자식 생기는 버그 -> target이 contenteditable의 하위 자식으로 선택되어 생긴 버그
+  if (target.innerHTML === '<br>') target.removeChild(target.firstElementChild);
 
   // const anchorOffset = selection.anchorOffset ?? 0;
 
@@ -148,7 +145,7 @@ const debounce = <T extends any[]>(f: (...args: T) => void, ms: number) => {
   };
 };
 
-// editor.addEventListener('input', debounce(editHandler, 100));
+editor.addEventListener('input', debounce(editHandler, 100));
 editor.addEventListener('paste', pasteHandler);
 
 /*
