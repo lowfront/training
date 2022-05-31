@@ -15,10 +15,10 @@ const editHandler = (ev: Event) => {
   const target = ev.target as HTMLDivElement;
   const selection = window.getSelection() as Selection;
   
-  if (target.childNodes.length === 1 && target.firstElementChild.tagName === 'br') {
-    console.log('br');
-    target.removeChild(target.firstElementChild);
-  } // 붙여넣기시 br 자식 생기는 버그
+  // if (target.childNodes.length === 1 && target.firstElementChild.tagName === 'br') {
+  //   console.log('br');
+  //   target.removeChild(target.firstElementChild);
+  // } // 붙여넣기시 br 자식 생기는 버그 -> target이 contenteditable의 하위 자식으로 선택되어 생긴 버그
 
   // const anchorOffset = selection.anchorOffset ?? 0;
 
@@ -83,7 +83,7 @@ const getLines = (rootNode: Node) => {
 const startFragment = '<!--StartFragment-->';
 const endFragment = '<!--EndFragment-->';
 
-const blockTags = ['DIV', 'P', 'SECTION', 'MAIN', 'ARTICLE'];
+const blockTags = ['DIV', 'P', 'SECTION', 'MAIN', 'ARTICLE', 'BR'];
 
 const pasteHandler = (ev: ClipboardEvent) => {
   ev.preventDefault();
@@ -149,15 +149,13 @@ const pasteHandler = (ev: ClipboardEvent) => {
   for (const item of result) {
     const div = document.createElement('div');
     for (const { node, color } of item) {
-      const span = Object.assign(document.createElement('span'), { style: `color: ${color}` });
+      const span = Object.assign(document.createElement('span'), {});//, { style: `color: ${color}` });
       span.appendChild(node);
       div.appendChild(span);
     }
     resultHTML += div.outerHTML;
   }
-  // console.log(resultHTML);
-  // (ev.target as HTMLElement).innerHTML = '';
-  (ev.target as HTMLElement).innerHTML = resultHTML;
+  (ev.currentTarget as HTMLElement).innerHTML += resultHTML;
 };
 
 const debounce = <T extends any[]>(f: (...args: T) => void, ms: number) => {
