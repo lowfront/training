@@ -13,13 +13,18 @@ Electron의 WebRequest 클래스는 renderer 프로세스의 요청을 가로채
 const { session } = require('electron');
 
 const filters = {
-  urls: ['<url>']
-}
+  urls: ['<url>'],
+};
+
 session.defaultSession.webRequest.onBeforeSendHeaders(filters, async (details, cb) => {
-  const cookies = await session.defaultSession.cookies.get({ url: '<url>' });
-  const cookie = cookies.map(({name, value}) => `${name}=${value}`).join(';');
-  details.requestHeaders.cookie = cookie;
-  cb({requestHeaders: details.requestHeaders});
+  try {
+    const cookies = await session.defaultSession.cookies.get({ url: '<url>' });
+    const cookieHeader = cookies.map(({name, value}) => `${name}=${value}`).join(';');
+    details.requestHeaders.cookie = cookieHeader;
+    cb({requestHeaders: details.requestHeaders});
+  } catch {
+    cb({});
+  }
 });
 ```
 
