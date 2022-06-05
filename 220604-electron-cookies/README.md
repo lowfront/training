@@ -46,7 +46,6 @@ session.defaultSession.webRequest.onBeforeSendHeaders(filters, async (details, c
     details.requestHeaders.cookie = cookieHeader;
     cb({requestHeaders: details.requestHeaders});
   } catch (err) {
-    console.warn(err);
     cb({});
   }
 });
@@ -56,4 +55,26 @@ fetch('http://localhost:8080', {
   headers: { 'electron-credentials': true }
 });
 
+```
+
+응답에 있는 `set-cookie`헤더도 같은 방식으로 처리할 수 있음. 필요에 따라 쿠키객체의 url과 domain을 수정해서 저장해야 함.
+```js
+session.defaultSession.webRequest.onHeadersReceived(filters, async (details, cb) => {
+  try {
+    if (!details.responseHeaders?.['set-cookie']) return cb({});
+
+    const setCookies = details.responseHeaders?.['set-cookie'].map(val => {
+      const [key, rawValue] = val.split('=');
+      return [key, rawValue.slice(0, rawValue.indexOf(';'))];
+    });
+
+    await Promise.all(
+      setCookies.map(([key, value]) => session.defaultSession.cookies.set({ url: details.url, name: key, value, domain: details.url}))
+    );
+
+    return cb({});
+  } catch (err) {
+    cb({});
+  }
+});
 ```
