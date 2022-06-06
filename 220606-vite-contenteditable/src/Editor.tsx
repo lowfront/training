@@ -96,8 +96,8 @@ export class ContentEditableEditor {
       console.log('[paste trigger end]');
 
       target.innerHTML = result.map((nodes) => {
-        return `<div>${nodes.map(node => node.nodeValue).join('')}</div>`
-      }).join('');
+        return `${nodes.map(node => node.nodeValue).join('')}`
+      }).join('<br>');
     }
   }
 
