@@ -21,12 +21,12 @@ input:
 
 output:
 <root>
-  <block>text node 1</block>
-  <block>text node 2</block>
-  <block>text node 3</block>
-  <block>text node 4</block>
-  <block>text node 5</block>
-  <block>text node 6</block>
+  text node 1<br>
+  text node 2<br>
+  text node 3<br>
+  text node 4<br>
+  text node 5<br>
+  text node 6<br>
 </root>
 */
 export type EditorNode = {
