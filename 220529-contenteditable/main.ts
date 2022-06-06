@@ -10,24 +10,8 @@ const cursor = document.createElement('div');
 document.getElementById('root').appendChild(editor);
 document.getElementById('root').appendChild(cursor);
 
-const editHandler = (ev: Event) => {
-  console.log('input', ev)
-  const target = ev.target as HTMLDivElement;
-  const selection = window.getSelection() as Selection;
-  
-  if (target.innerHTML === '<br>') target.removeChild(target.firstElementChild);
+const editHandler = (ev: Event) => {};
 
-  // const anchorOffset = selection.anchorOffset ?? 0;
-
-  // cursor.innerText = '' + anchorOffset;
-
-
-  // if (target.firstChild.nodeType === 3) wrapTextNode(target);
-  
-
-  const lines = getLines(target);
-  console.log(lines);
-};
 const wrapTextNode = (target: HTMLElement) => {
   const selection = window.getSelection() as Selection;
   const div = document.createElement('div');
@@ -59,53 +43,55 @@ const getLines = (rootNode: Node) => {
   return [...rootNode.childNodes].map(getTextNodesByRoot);
 };
 
-const startFragment = '<!--StartFragment-->';
-const endFragment = '<!--EndFragment-->';
+const START_FRAGMENT = '<!--StartFragment-->';
+const END_FRAGMENT = '<!--EndFragment-->';
 
 const blockTags = ['DIV', 'P', 'SECTION', 'MAIN', 'ARTICLE', 'BR'];
 
+type StackItem =
+| {
+  type: 'text',
+  node: Node;
+  i: boolean;
+  u: boolean;
+  b: boolean;
+  block: boolean;
+  color: string;
+} 
+| {
+  type: 'group',
+  node: Node;
+  i: boolean;
+  u: boolean;
+  b: boolean;
+  block: boolean;
+  color: string;
+};
+
+function nodeToStackItem(node: Node, parentStackItem: Partial<StackItem> = {}) {
+  const block = blockTags.includes((node as HTMLElement).tagName);
+
+  return {
+    type: node.nodeType === 1 ? 'group' : 'text',
+    node,
+    i: parentStackItem.i ?? false,
+    u: parentStackItem.u ?? false,
+    b: parentStackItem.b ?? false,
+    block,
+    color: (node as HTMLElement).style?.color ?? (parentStackItem.color ?? ''),
+  } as StackItem;
+}
+
 const pasteHandler = (ev: ClipboardEvent) => {
   ev.preventDefault();
-  console.log('paste', ev);
   const htmlData = ev.clipboardData.getData('text/html');
-  const startIndex = htmlData.indexOf(startFragment) + startFragment.length;
-  const endIndex = htmlData.indexOf(endFragment);
+  const startIndex = htmlData.indexOf(START_FRAGMENT) + START_FRAGMENT.length;
+  const endIndex = htmlData.indexOf(END_FRAGMENT);
   const wrap = document.createElement('div');
   wrap.innerHTML = htmlData.slice(startIndex, endIndex);
-  type StackItem =
-  | {
-    type: 'text',
-    node: Node;
-    i: boolean;
-    u: boolean;
-    b: boolean;
-    block: boolean;
-    color: string;
-  } 
-  | {
-    type: 'group',
-    node: Node;
-    i: boolean;
-    u: boolean;
-    b: boolean;
-    block: boolean;
-    color: string;
-  };
-  function nodeToStackItem(node: Node, parentStackItem: StackItem|Partial<StackItem> = {}) {
-    const block = blockTags.includes((node as HTMLElement).tagName);
 
-    return {
-      type: node.nodeType === 1 ? 'group' : 'text',
-      node,
-      i: parentStackItem.i ?? false,
-      u: parentStackItem.u ?? false,
-      b: parentStackItem.b ?? false,
-      block,
-      color: (node as HTMLElement).style?.color ?? (parentStackItem.color ?? ''),
-    } as StackItem;
-  }
   const stack: StackItem[] = [...wrap.childNodes].map(node => nodeToStackItem(node));
-  const result = [[]];
+  const result: StackItem[][] = [[]];
   let target: StackItem;
   
   while (target = stack.shift()) {
