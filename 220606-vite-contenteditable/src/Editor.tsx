@@ -109,8 +109,61 @@ export class ContentEditableEditor {
     const endIndex = htmlData.indexOf(ContentEditableEditor.END_FRAGMENT);
     
     const wrap = document.createElement('div');
-    wrap.innerHTML = htmlData.slice(startIndex, endIndex);
-    console.log(wrap);
+    console.log(wrap.innerHTML = htmlData.slice(startIndex, endIndex));
+    
+    type EditorNode = {
+      node: Node;
+      block: boolean;
+      root: boolean;
+      prevBr: boolean;
+    };
+/*
+  규칙
+  root의 첫번째 자식은 br을 제외하고는 무조건 block: false이다
+  root는 첫번째 자식으로 재귀적으로 상속된다.
+  block: true는 block속성을 가진 태그 노드, 또는 block: true 속성을 가진 노드의 첫번째 자식 노드에 부여된다.
+  자식 노드 리스트 중 직전노드가 br이면 현재 노드의 block은 무조건 false이다.
+  block: true는 최종 계산후 줄바꿈으로 변환된다. 
+*/
+    const nodeIterable = createDFSIterable<EditorNode>(
+      {
+        node: wrap,
+        block: false,
+        root: true,
+        prevBr: false,
+      },
+      (editorNode, stack) => {
+        const isTag = editorNode.node.nodeType === 1;
+        const isBlock = editorNode.block || editorNode.prevBr && !editorNode.root && isTag && ContentEditableEditor.BLOCK_TAGS.includes((editorNode.node as HTMLElement).tagName);
+
+        if (isTag) {
+          const childNodes = [...editorNode.node.childNodes].map((node, index, array) => {
+            // console.log(node, (node as any)?.tagName === 'BR' || (array[index - 1] as any)?.tagName !== 'BR' && isBlock && index === 0);
+            return {
+              node,
+              block: (node as any)?.tagName === 'BR' || isBlock && index === 0, // 부모가 block이면 첫 자식 줄바꿈, 자식이 BR인 경우 무조건 줄바꿈
+              root: editorNode.root && index === 0,
+              prevBr: (array[index - 1] as any)?.tagName !== 'BR',
+            };
+          });
+
+          return childNodes;
+        } else {
+          return;
+        }
+      }
+    );
+    let result = '';
+    for (const editorNode of nodeIterable) {
+      if ((editorNode.node as any).tagName === 'BR' || (editorNode.node.nodeType === 3 && editorNode.block)) {
+        result += '<br>';
+      }
+      if (editorNode.node.nodeType === 3) {
+        result += editorNode.node.nodeValue;
+      } 
+    }
+    console.log(result);
+    // return result;
   };
 
   appendTo(element: HTMLElement) {
