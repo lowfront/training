@@ -44,6 +44,8 @@ const EditorReturnNode: EditorNode = {
 
 export class ContentEditableEditor {
   static BLOCK_TAGS = ['DIV', 'P', 'SECTION', 'MAIN', 'ARTICLE', 'BR'];
+  static START_FRAGMENT = '<!--StartFragment-->';
+  static END_FRAGMENT = '<!--EndFragment-->';
 
   div: HTMLDivElement = Object.assign(document.createElement('div'), { style: 'width: 100%; height: 100%;', contentEditable: true });
 
@@ -93,7 +95,6 @@ export class ContentEditableEditor {
       }
       console.log(result);
       this.pasteTrigger = false;
-      console.log('[paste trigger end]');
 
       target.innerHTML = result.map((nodes) => {
         return `${nodes.map(node => node.nodeValue).join('')}`
@@ -102,8 +103,14 @@ export class ContentEditableEditor {
   }
 
   pasteIntercept(ev: ClipboardEvent) { // debounce 없이 바로 변조
-    console.log('[paste trigger start]');
     this.pasteTrigger = true;
+    const htmlData = ev.clipboardData?.getData('text/html') ?? '';
+    const startIndex = htmlData.indexOf(ContentEditableEditor.START_FRAGMENT) + ContentEditableEditor.START_FRAGMENT.length;
+    const endIndex = htmlData.indexOf(ContentEditableEditor.END_FRAGMENT);
+    
+    const wrap = document.createElement('div');
+    wrap.innerHTML = htmlData.slice(startIndex, endIndex);
+    console.log(wrap);
   };
 
   appendTo(element: HTMLElement) {
@@ -125,6 +132,7 @@ const Editor: FC = () => {
       border: '1px solid black',
       width: 500,
       height: 400,
+      textAlign: 'left',
     }} 
     ref={ref}
   />;
