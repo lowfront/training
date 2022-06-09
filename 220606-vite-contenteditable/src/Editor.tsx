@@ -124,6 +124,27 @@ export class ContentEditableEditor {
   block: true는 block속성을 가진 태그 노드, 또는 block: true 속성을 가진 노드의 첫번째 자식 노드에 부여된다.
   자식 노드 리스트 중 직전노드가 br이면 현재 노드의 block은 무조건 false이다.
   block: true는 최종 계산후 줄바꿈으로 변환된다. 
+
+  <root>
+    <first-child block=false>
+      <first-child block=false>
+        <first-child block=false>
+          <br block=true>
+        </first-child>
+      </first-child>
+    </first-child>
+    <tag block=false>
+      <tag block=true>
+        text
+      </tag>
+      text
+      <tag block=false></tag>
+    </tag>
+    <tag block=true></tag>
+  </root>
+
+  br 이후 바로 다음에 나온 block은 효과가 없음
+  또는 br 등장하면 다음 노드는 무조건 block
 */
     const nodeIterable = createDFSIterable<EditorNode>(
       {
