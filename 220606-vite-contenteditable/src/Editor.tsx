@@ -73,7 +73,7 @@ export class ContentEditableEditor {
     this.pasteTrigger = true;
     const htmlData = ev.clipboardData?.getData('text/html') ?? '';
     const root = pasteParse(htmlData);
-    console.log(beautify(root.innerHTML, {format: 'html', }));
+    console.log(beautify(htmlData, {format: 'html', }));
 
     let result = '';
     for (const editorNode of nodeToEditorNodes(root)) {
