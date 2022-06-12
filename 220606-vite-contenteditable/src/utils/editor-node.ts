@@ -81,13 +81,13 @@ export function* nodeToEditorNodes(root: Node) {
             block: !isRoot && (isBlockByParent || isPrevBlockTag || isPrevBr),
             root: isRoot,
             text: isTextNode(childNode),
-            meta: {
-              isRoot,
-              isBlockByParent,
-              isPrevBlockTag,
-              isPrevBr,
-              siblings: node.childNodes,
-            },
+            // meta: {
+            //   isRoot,
+            //   isBlockByParent,
+            //   isPrevBlockTag,
+            //   isPrevBr,
+            //   siblings: node.childNodes,
+            // },
           };
           // console.log(result, (childNode as any)?.outerHTML);
           return result;
