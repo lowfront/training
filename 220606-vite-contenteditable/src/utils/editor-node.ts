@@ -48,3 +48,68 @@ export function pasteParse(str: string) {
 
   return wrap;
 }
+
+export function* nodeToEditorNodes(root: Node) {
+  const editorNodeIterator = createDFSIterable<EditorNode>(
+    {
+      node: root,
+      root: true,
+      block: false,
+      text: false,
+    },
+    editorNode => {
+      const { node, root, block } = editorNode;
+      if (isHTMLElement(node)) {
+        let prevBr: boolean = false;
+        let prevBlockTag: boolean = false;
+
+        const childNodes = [...node.childNodes].map((childNode, index, array) => {
+          const isRoot = root && !index;
+          const isBlockByParent = !root && block && !index;
+
+          const isPrevBlockTag = prevBlockTag;
+          const isPrevBr = prevBr;
+          
+          prevBlockTag = prevBr = false;
+          prevBlockTag ||= isHTMLElement(childNode) && BLOCK_TAGS.includes(childNode.tagName);
+          prevBr ||= isHTMLElement(childNode) && childNode.tagName === 'BR';
+
+          // console.log('prevBlockTag', node.tagName, prevBlockTag);
+
+          const result = {
+            node: childNode,
+            block: !isRoot && (isBlockByParent || isPrevBlockTag || isPrevBr),
+            root: isRoot,
+            text: isTextNode(childNode),
+            meta: {
+              isRoot,
+              isBlockByParent,
+              isPrevBlockTag,
+              isPrevBr,
+              siblings: node.childNodes,
+            },
+          };
+          // console.log(result, (childNode as any)?.outerHTML);
+          return result;
+        });
+
+        if (!childNodes.length) {
+          return [
+            {
+              node: document.createTextNode(''),
+              block: !root && block,
+              root,
+              text: true,
+            }
+          ];
+        }
+
+        return childNodes;
+      }
+    }
+  );
+  
+  for (const editorNode of editorNodeIterator) {
+    if (editorNode.text) yield editorNode;
+  }
+}
