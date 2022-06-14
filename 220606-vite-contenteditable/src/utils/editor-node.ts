@@ -74,7 +74,7 @@ export function getChildNodesByWithoutPre(editorNode: EditorNode) {
 
   const childNodes = [...node.childNodes].map((childNode, index, array) => {
     const isRoot = root && !index;
-    const isBlockByParent = !root && block && !index;
+    const isBlockByParent: boolean = !root && block && !index;
 
     const isPrevBlockTag = prevBlockTag;
     const isPrevBr = prevBr;
@@ -131,4 +131,8 @@ export function* nodeToEditorNodes(root: Node) {
   for (const editorNode of editorNodeIterator) {
     if (editorNode.text) yield editorNode;
   }
+}
+
+export function isBr(node: Node): node is HTMLBRElement {
+  return node.nodeType === 1 && (node as HTMLElement).tagName === 'BR';
 }
