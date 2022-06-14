@@ -133,6 +133,6 @@ export function* nodeToEditorNodes(root: Node) {
   }
 }
 
-export function isBr(node: Node): node is HTMLBRElement {
-  return node.nodeType === 1 && (node as HTMLElement).tagName === 'BR';
+export function isBr(node: Node|null): node is HTMLBRElement {
+  return node?.nodeType === 1 && (node as HTMLElement).tagName === 'BR';
 }
