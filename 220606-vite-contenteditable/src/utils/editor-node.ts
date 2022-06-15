@@ -1,3 +1,4 @@
+import { KeyboardEvent } from "react";
 import { createDFSIterable } from "../helper/utils";
 
 /*
@@ -135,4 +136,57 @@ export function* nodeToEditorNodes(root: Node) {
 
 export function isBr(node: Node|null): node is HTMLBRElement {
   return node?.nodeType === 1 && (node as HTMLElement).tagName === 'BR';
+}
+
+export function enterTransform(ev: KeyboardEvent, parentNode: HTMLElement) {
+  ev.preventDefault();
+  const selection = window.getSelection();
+  if (!selection || !selection.anchorNode) return;
+  const range = document.createRange();
+
+  const { anchorNode, focusOffset } = selection;
+
+  const isZeroWidth = parentNode === anchorNode;
+  
+  if (isZeroWidth) {
+    const br = document.createElement('br');
+    const insertBeforeTarget = parentNode.childNodes[focusOffset];
+    if (!parentNode.childNodes.length) parentNode.appendChild(document.createElement('br'));
+    insertBeforeTarget ? parentNode.insertBefore(br, insertBeforeTarget) : parentNode.appendChild(br);
+
+    range.setStart(parentNode, focusOffset + 1);
+  } else {
+    (anchorNode as Text).splitText(focusOffset);
+    const nextNode = anchorNode.nextSibling;
+    let focusNode: Node;
+    if (nextNode?.nodeValue) {
+      parentNode.insertBefore(document.createElement('br'), nextNode);
+      focusNode = nextNode;
+    } else {
+      focusNode = document.createElement('br');
+      let checkBr = false;
+      let computedNextNode: Node|null = nextNode;
+      while (computedNextNode = computedNextNode?.nextSibling ?? null) checkBr ||= isBr(computedNextNode);
+      
+      console.log(anchorNode, checkBr);
+      parentNode.insertBefore(focusNode, nextNode);
+      
+      if (!checkBr) {
+          parentNode.insertBefore(focusNode = document.createElement('br'), nextNode);
+      } else {
+        focusNode = focusNode.nextSibling as Node;
+      }
+    }
+    // Selection.anchorNode가 BR 태그가 되면 포커싱이 잡히지 않음. BR태그 대신 부모 노드에서 offset으로 선택해야 함
+    if (isBr(focusNode)) {
+      const focusNodeIndex = [...parentNode.childNodes ?? []].indexOf(focusNode);
+      range.setStart(parentNode, focusNodeIndex);
+    } else {
+      range.setStart(focusNode, 0);        
+    }
+  }
+  
+  range.collapse(true);
+  selection.removeAllRanges();
+  selection.addRange(range);
 }

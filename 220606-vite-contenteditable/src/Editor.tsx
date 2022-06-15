@@ -1,6 +1,6 @@
 import beautify from "beautify";
 import { ClipboardEvent, ClipboardEventHandler, FC, FormEvent, KeyboardEvent, SyntheticEvent, useCallback, useEffect, useRef, useState } from "react";
-import { pasteParse, nodeToEditorNodes, isBr } from "./utils/editor-node";
+import { pasteParse, nodeToEditorNodes, isBr, enterTransform } from "./utils/editor-node";
 
 /*
 
@@ -35,69 +35,7 @@ const Editor: FC = () => {
   const ref = useRef<HTMLDivElement>(null);
   const inputHandler = useCallback((ev: KeyboardEvent) => {
     if (!ref.current) return;
-    if (ev.code === 'Enter') {
-      const parentNode = ref.current;
-      ev.preventDefault();
-      const selection = window.getSelection();
-      if (!selection || !selection.anchorNode) return;
-      const range = document.createRange();
-
-      const { anchorNode, focusOffset } = selection;
-
-      const isZeroWidth = parentNode === anchorNode;
-      
-      if (isZeroWidth) {
-        const br = document.createElement('br');
-        const insertBeforeTarget = parentNode.childNodes[focusOffset];
-        if (!parentNode.childNodes.length) parentNode.appendChild(document.createElement('br'));
-        insertBeforeTarget ? parentNode.insertBefore(br, insertBeforeTarget) : parentNode.appendChild(br);
-
-        range.setStart(parentNode, focusOffset + 1);
-        range.collapse(true);
-        selection.removeAllRanges();
-        selection.addRange(range);
-        return;
-      }
-
-      (anchorNode as Text).splitText(focusOffset);
-      const nextNode = anchorNode.nextSibling;
-      let focusNode: Node;
-      if (nextNode?.nodeValue) {
-        parentNode.insertBefore(document.createElement('br'), nextNode);
-        focusNode = nextNode;
-      } else {
-        focusNode = document.createElement('br');
-        // focusNode = document.createElement('br');
-        let checkBr = false;
-        let computedNextNode: Node|null = nextNode;
-        while (computedNextNode = computedNextNode?.nextSibling ?? null) checkBr ||= isBr(computedNextNode);
-        
-        console.log(anchorNode, checkBr);
-        parentNode.insertBefore(focusNode, nextNode);
-        
-        if (!checkBr) {
-            parentNode.insertBefore(focusNode = document.createElement('br'), nextNode);
-        } else {
-          focusNode = focusNode.nextSibling as Node;
-        }
-        // console.log(nextNode, parentNode.lastChild);
-        // // 사라지기때문에 이걸로 하면 안됨
-        // if (nextNode === parentNode.lastChild) {
-        //   parentNode.insertBefore(focusNode = document.createElement('br'), nextNode);
-        // }
-      }
-      // Selection.anchorNode가 BR 태그가 되면 포커싱이 잡히지 않음. BR태그 대신 부모 노드에서 offset으로 선택해야 함
-      if (isBr(focusNode)) {
-        const focusNodeIndex = [...parentNode.childNodes ?? []].indexOf(focusNode);
-        range.setStart(parentNode, focusNodeIndex);
-      } else {
-        range.setStart(focusNode, 0);        
-      }
-      range.collapse(true);
-      selection.removeAllRanges();
-      selection.addRange(range);
-
-    }
+    if (ev.code === 'Enter') enterTransform(ev, ref.current);
   }, []);
 
   const pasteHandler = useCallback((ev: ClipboardEvent<HTMLDivElement>) => {
