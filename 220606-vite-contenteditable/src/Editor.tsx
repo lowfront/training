@@ -1,6 +1,6 @@
 import beautify from "beautify";
-import { ClipboardEvent, ClipboardEventHandler, FC, FormEvent, KeyboardEvent, SyntheticEvent, useCallback, useEffect, useRef, useState } from "react";
-import { pasteParse, nodeToEditorNodes, isBr, enterTransform } from "./utils/editor-node";
+import { ClipboardEvent, FC, KeyboardEvent, useCallback, useRef } from "react";
+import { pasteParse, nodeToEditorNodes, enterTransform, linkTransform } from "./utils/editor-node";
 
 /*
 
@@ -34,8 +34,11 @@ output:
 const Editor: FC = () => {
   const ref = useRef<HTMLDivElement>(null);
   const inputHandler = useCallback((ev: KeyboardEvent) => {
-    if (!ref.current) return;
-    if (ev.code === 'Enter') enterTransform(ev, ref.current);
+    const editorNode = ref.current;
+    if (!editorNode) return;
+    if (ev.code === 'Enter') enterTransform(ev, editorNode);
+
+    linkTransform(ev, editorNode);
   }, []);
 
   const pasteHandler = useCallback((ev: ClipboardEvent<HTMLDivElement>) => {
