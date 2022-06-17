@@ -190,3 +190,20 @@ export function enterTransform(ev: KeyboardEvent, parentNode: HTMLElement) {
   selection.removeAllRanges();
   selection.addRange(range);
 }
+
+export const HTTP_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
+
+export function linkTransform(ev: KeyboardEvent, parentNode: HTMLElement) {
+  const nodeStruct = [...parentNode.childNodes].reduce((acc, node) => {
+    if (isHTMLElement(node) && node.tagName === 'BR') {
+      acc.push([]);
+      return acc;
+    }
+    if (!node.nodeValue) return acc;
+    const chn = acc[acc.length - 1];
+    chn.push(node);
+    return acc;
+  }, [[]] as Node[][])
+  console.log(nodeStruct);
+  
+}
