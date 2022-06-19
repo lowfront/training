@@ -1,5 +1,6 @@
 import beautify from "beautify";
 import { ClipboardEvent, FC, KeyboardEvent, useCallback, useRef } from "react";
+import { debounce } from "./helper/utils";
 import { pasteParse, nodeToEditorNodes, enterTransform, linkTransform } from "./utils/editor-node";
 
 /*
@@ -31,6 +32,8 @@ output:
 </root>
 */
 
+const debouncedLineTransform = debounce(linkTransform, 300);
+
 const Editor: FC = () => {
   const ref = useRef<HTMLDivElement>(null);
   const inputHandler = useCallback((ev: KeyboardEvent) => {
@@ -38,7 +41,7 @@ const Editor: FC = () => {
     if (!editorNode) return;
     if (ev.code === 'Enter') enterTransform(ev, editorNode);
 
-    linkTransform(ev, editorNode);
+    debouncedLineTransform(ev, editorNode);
   }, []);
 
   const pasteHandler = useCallback((ev: ClipboardEvent<HTMLDivElement>) => {
