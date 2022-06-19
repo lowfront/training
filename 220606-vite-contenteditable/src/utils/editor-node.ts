@@ -233,5 +233,25 @@ export function linkTransform(ev: KeyboardEvent, parentNode: HTMLElement) {
     nodes.push(...newNodes);
   }
 
-  console.log(nodeStructs);
+  // console.log(nodeStructs);
+
+  const transformResult = nodeStructs.reduce((acc, nodes, i, { length }) => {
+    if (!nodes.length) {
+      if (i === length - 1) return acc;
+      return acc + '<br>';
+      //  + (i === (length - 1) ? '<br>' : '');
+    }
+    return acc + nodes.reduce((acc, node) => {
+      if (node instanceof Text) {
+        return acc + node.nodeValue;
+      } else if (node instanceof HTMLAnchorElement) {
+        return acc + node.outerHTML;
+      } else {
+        throw new Error('Invalid node type');
+      }
+    }, '') + '<br>';
+  }, '');
+
+  console.log(transformResult);
+  // parentNode.innerHTML = transformResult;
 }
