@@ -14,3 +14,11 @@ export function* createDFSIterable<T>(root: T, next: DFSNext<T>) {
   let done: boolean|undefined;
   while (({value, done} = iteratble.next(next)), !done) yield value as T;
 }
+
+export function debounce<T extends any[]>(f: (...args: T) => void, ms: number) {
+  let timer: number|undefined;
+  return (...args: T) => {
+    clearTimeout(timer);
+    timer = setTimeout(f, ms, ...args);
+  };
+}
