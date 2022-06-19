@@ -168,7 +168,7 @@ export function enterTransform(ev: KeyboardEvent, parentNode: HTMLElement) {
       let computedNextNode: Node|null = nextNode;
       while (computedNextNode = computedNextNode?.nextSibling ?? null) checkBr ||= isBr(computedNextNode);
       
-      console.log(anchorNode, checkBr);
+      // console.log(anchorNode, checkBr);
       parentNode.insertBefore(focusNode, nextNode);
       
       if (!checkBr) {
@@ -191,19 +191,47 @@ export function enterTransform(ev: KeyboardEvent, parentNode: HTMLElement) {
   selection.addRange(range);
 }
 
-export const HTTP_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
+export const HTTP_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g;
 
 export function linkTransform(ev: KeyboardEvent, parentNode: HTMLElement) {
-  const nodeStruct = [...parentNode.childNodes].reduce((acc, node) => {
+  const nodeStructs = [...parentNode.childNodes].reduce((acc, node, i, { length }) => {
     if (isHTMLElement(node) && node.tagName === 'BR') {
-      acc.push([]);
+      // console.log(i !== length - 1, i, length);
+      i !== length - 1 && acc.push([]);
       return acc;
     }
     if (!node.nodeValue) return acc;
     const chn = acc[acc.length - 1];
     chn.push(node);
     return acc;
-  }, [[]] as Node[][])
-  console.log(nodeStruct);
+  }, [[]] as Node[][]);
   
+  console.log(nodeStructs);
+
+  for (const nodes of nodeStructs) {
+    if (!nodes.length) continue;
+
+    const textContent = nodes.reduce((acc, { nodeValue }) => acc += nodeValue, '');
+    const matchResult: RegExpMatchArray[] = [...textContent.matchAll(HTTP_REGEX)];
+    if (!matchResult || !matchResult.length) continue;
+    
+    let previousIndex = 0;
+    const newNodes: Node[] = [];
+    for (const matchResultItem of matchResult) {
+      const {'0': target, index} = matchResultItem as typeof matchResultItem & { index: number };
+
+      const textNode = document.createTextNode(textContent.slice(previousIndex, index));
+      newNodes.push(textNode);
+      const linkNode = Object.assign(document.createElement('a'), { href: target, target: '_blank', textContent: target });
+      newNodes.push(linkNode);
+      previousIndex += textNode.length + target.length;
+    }
+    const textNode = document.createTextNode(textContent.slice(previousIndex));
+    newNodes.push(textNode);
+
+    nodes.splice(0);
+    nodes.push(...newNodes);
+  }
+
+  console.log(nodeStructs);
 }
