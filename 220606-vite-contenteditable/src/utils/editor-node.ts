@@ -208,11 +208,10 @@ export function linkTransform(ev: KeyboardEvent, parentNode: HTMLElement) {
 
   const nodeStructs = [...parentNode.childNodes].reduce((acc, node, i, { length }) => {
     if (isHTMLElement(node) && node.tagName === 'BR') {
-      // console.log(i !== length - 1, i, length);
       i !== length - 1 && acc.push([]);
       return acc;
     }
-    if (!node.nodeValue) return acc;
+    if (!node.nodeValue && !node.textContent) return acc;
     const chn = acc[acc.length - 1];
     chn.push(node);
     return acc;
@@ -222,8 +221,7 @@ export function linkTransform(ev: KeyboardEvent, parentNode: HTMLElement) {
 
   for (const nodes of nodeStructs) {
     if (!nodes.length) continue;
-
-    const textContent = nodes.reduce((acc, { nodeValue }) => acc += nodeValue, '');
+    const textContent = (nodes as (Node | HTMLElement)[]).reduce((acc, { nodeValue, textContent }) => acc += nodeValue ?? textContent, '');
     const matchResult: RegExpMatchArray[] = [...textContent.matchAll(HTTP_REGEX)];
     if (!matchResult || !matchResult.length) continue;
     
