@@ -191,7 +191,7 @@ export function enterTransform(ev: KeyboardEvent, parentNode: HTMLElement) {
   selection.addRange(range);
 }
 
-export const HTTP_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g;
+export const HTTP_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
 
 export function linkTransform(ev: KeyboardEvent, parentNode: HTMLElement) {
 
@@ -206,6 +206,7 @@ export function linkTransform(ev: KeyboardEvent, parentNode: HTMLElement) {
   const computedAnchorNode = isAnchorNodeSameBr ? parentNode : anchorNode;
   const computedFocusOffset = isAnchorNodeSameBr ? [...parentNode.childNodes].indexOf(anchorNode) : focusOffset;
 
+export function linkTransform(ev: KeyboardEvent, parentNode: HTMLElement) {
   const nodeStructs = [...parentNode.childNodes].reduce((acc, node, i, { length }) => {
     if (isHTMLElement(node) && node.tagName === 'BR') {
       i !== length - 1 && acc.push([]);
@@ -217,55 +218,42 @@ export function linkTransform(ev: KeyboardEvent, parentNode: HTMLElement) {
     return acc;
   }, [[]] as Node[][]);
   
-  console.log(nodeStructs);
-
   for (const nodes of nodeStructs) {
     if (!nodes.length) continue;
-    const textContent = (nodes as (Node | HTMLElement)[]).reduce((acc, { nodeValue, textContent }) => acc += nodeValue ?? textContent, '');
-    const matchResult: RegExpMatchArray[] = [...textContent.matchAll(HTTP_REGEX)];
-    if (!matchResult || !matchResult.length) continue;
     
-    let previousIndex = 0;
-    const newNodes: Node[] = [];
-    for (const matchResultItem of matchResult) {
-      const {'0': target, index} = matchResultItem as typeof matchResultItem & { index: number };
+    for (const node of nodes as (Node | HTMLElement)[]) {
+      if (node instanceof HTMLAnchorElement) {
+        if (!node.textContent?.match(HTTP_REGEX)) {
+          // remove anchor
+          const parentNode = node.parentNode as Node;
+          const childNodes = [...node.childNodes];
+          childNodes.forEach(childNode => parentNode.insertBefore(childNode, node));
+          parentNode.removeChild(node);
+          // mergeSiblingTextNode(childNodes[0] as Text);
+        } else {
+          // update href
+          node.href = node.textContent;
+        }
+      } else if (node instanceof Text) {
+        let nextTextNode: Text = node;
+        let matchResult: RegExpMatchArray|null;
+        while (matchResult = (nextTextNode.nodeValue ?? '').match(HTTP_REGEX)) {
+          console.log(matchResult);
+          const {'0': target, index} = matchResult as typeof matchResult & { index: number };
+          const anchorTextContent = node.splitText(index);
+          nextTextNode = anchorTextContent.splitText(target.length);
 
-      const textNode = document.createTextNode(textContent.slice(previousIndex, index));
-      newNodes.push(textNode);
-      const linkNode = Object.assign(document.createElement('a'), { href: target, target: '_blank', textContent: target });
-      newNodes.push(linkNode);
-      previousIndex += textNode.length + target.length;
+          const anchor = Object.assign(document.createElement('a'), { href: anchorTextContent });
+          const parentNode = anchorTextContent.parentNode as Node;
+          parentNode.insertBefore(anchor, anchorTextContent);
+          anchor.appendChild(anchorTextContent);
+          // mergeSiblingTextNode(nextTextNode as Text);
     }
-    const textNode = document.createTextNode(textContent.slice(previousIndex));
-    newNodes.push(textNode);
 
-    nodes.splice(0);
-    nodes.push(...newNodes);
+      }
+    }
   }
 
   console.log(nodeStructs);
 
-  const transformResult = nodeStructs.reduce((acc, nodes, i, { length }) => {
-    if (!nodes.length) {
-      return acc + '<br>';
-    }
-    return acc + nodes.reduce((acc, node) => {
-      if (node instanceof Text) {
-        return acc + node.nodeValue;
-      } else if (node instanceof HTMLAnchorElement) {
-        return acc + node.outerHTML;
-      } else {
-        throw new Error('Invalid node type');
-      }
-    }, '') + '<br>';
-  }, '');
-
-  console.log(transformResult);
-  parentNode.innerHTML = transformResult;
-  // console.log(anchorNode);
-  console.log(computedAnchorNode);
-  range.setStart(computedAnchorNode, computedFocusOffset);
-  range.collapse(true);
-  selection.removeAllRanges();
-  selection.addRange(range);
 }
