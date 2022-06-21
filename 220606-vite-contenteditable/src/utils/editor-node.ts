@@ -194,6 +194,18 @@ export function enterTransform(ev: KeyboardEvent, parentNode: HTMLElement) {
 export const HTTP_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g;
 
 export function linkTransform(ev: KeyboardEvent, parentNode: HTMLElement) {
+
+  // save selection
+  const selection = window.getSelection();
+  if (!selection || !selection.anchorNode) return;
+  const range = document.createRange();
+  const { anchorNode, focusOffset } = selection;
+  
+  const isAnchorNodeSameParentNode = anchorNode === parentNode;
+  const isAnchorNodeSameBr = isHTMLElement(anchorNode) && anchorNode.tagName === 'BR';
+  const computedAnchorNode = isAnchorNodeSameBr ? parentNode : anchorNode;
+  const computedFocusOffset = isAnchorNodeSameBr ? [...parentNode.childNodes].indexOf(anchorNode) : focusOffset;
+
   const nodeStructs = [...parentNode.childNodes].reduce((acc, node, i, { length }) => {
     if (isHTMLElement(node) && node.tagName === 'BR') {
       // console.log(i !== length - 1, i, length);
@@ -233,13 +245,11 @@ export function linkTransform(ev: KeyboardEvent, parentNode: HTMLElement) {
     nodes.push(...newNodes);
   }
 
-  // console.log(nodeStructs);
+  console.log(nodeStructs);
 
   const transformResult = nodeStructs.reduce((acc, nodes, i, { length }) => {
     if (!nodes.length) {
-      if (i === length - 1) return acc;
       return acc + '<br>';
-      //  + (i === (length - 1) ? '<br>' : '');
     }
     return acc + nodes.reduce((acc, node) => {
       if (node instanceof Text) {
@@ -253,5 +263,11 @@ export function linkTransform(ev: KeyboardEvent, parentNode: HTMLElement) {
   }, '');
 
   console.log(transformResult);
-  // parentNode.innerHTML = transformResult;
+  parentNode.innerHTML = transformResult;
+  // console.log(anchorNode);
+  console.log(computedAnchorNode);
+  range.setStart(computedAnchorNode, computedFocusOffset);
+  range.collapse(true);
+  selection.removeAllRanges();
+  selection.addRange(range);
 }
