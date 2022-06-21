@@ -193,18 +193,28 @@ export function enterTransform(ev: KeyboardEvent, parentNode: HTMLElement) {
 
 export const HTTP_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
 
-export function linkTransform(ev: KeyboardEvent, parentNode: HTMLElement) {
+export function mergeSiblingTextNode(node: Text) {
+  const nodeList = [node];
+  while (1) {
+    const prevNode = nodeList[0].previousSibling;
+    const nextNode = nodeList[nodeList.length - 1].nextSibling;
+    let prevNodeIsNotTextNode = false;
+    let nextNodeIsNotTextNode = false;
+    if (prevNode instanceof Text) nodeList.unshift(prevNode);
+    else prevNodeIsNotTextNode = true;
+    if (nextNode instanceof Text) nodeList.push(nextNode);
+    else nextNodeIsNotTextNode = true;
 
-  // save selection
-  const selection = window.getSelection();
-  if (!selection || !selection.anchorNode) return;
-  const range = document.createRange();
-  const { anchorNode, focusOffset } = selection;
+    if (prevNodeIsNotTextNode && nextNodeIsNotTextNode) break;
+  }
   
-  const isAnchorNodeSameParentNode = anchorNode === parentNode;
-  const isAnchorNodeSameBr = isHTMLElement(anchorNode) && anchorNode.tagName === 'BR';
-  const computedAnchorNode = isAnchorNodeSameBr ? parentNode : anchorNode;
-  const computedFocusOffset = isAnchorNodeSameBr ? [...parentNode.childNodes].indexOf(anchorNode) : focusOffset;
+  const [firstNode, ...tailNodes] = nodeList;
+  const parentNode = firstNode.parentNode as Node;
+  tailNodes.forEach(node => {
+    firstNode.appendData(node.nodeValue as string);
+    parentNode.removeChild(node);
+  });
+}
 
 export function linkTransform(ev: KeyboardEvent, parentNode: HTMLElement) {
   const nodeStructs = [...parentNode.childNodes].reduce((acc, node, i, { length }) => {
@@ -217,10 +227,10 @@ export function linkTransform(ev: KeyboardEvent, parentNode: HTMLElement) {
     chn.push(node);
     return acc;
   }, [[]] as Node[][]);
-  
+
   for (const nodes of nodeStructs) {
     if (!nodes.length) continue;
-    
+
     for (const node of nodes as (Node | HTMLElement)[]) {
       if (node instanceof HTMLAnchorElement) {
         if (!node.textContent?.match(HTTP_REGEX)) {
@@ -242,14 +252,14 @@ export function linkTransform(ev: KeyboardEvent, parentNode: HTMLElement) {
           const {'0': target, index} = matchResult as typeof matchResult & { index: number };
           const anchorTextContent = node.splitText(index);
           nextTextNode = anchorTextContent.splitText(target.length);
-
+  
           const anchor = Object.assign(document.createElement('a'), { href: anchorTextContent });
           const parentNode = anchorTextContent.parentNode as Node;
           parentNode.insertBefore(anchor, anchorTextContent);
           anchor.appendChild(anchorTextContent);
           // mergeSiblingTextNode(nextTextNode as Text);
-    }
-
+        }
+        
       }
     }
   }
