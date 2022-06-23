@@ -194,6 +194,12 @@ export function enterTransform(ev: KeyboardEvent, parentNode: HTMLElement) {
 export const HTTP_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
 
 export function mergeSiblingTextNode(node: Text) {
+  const selection = window.getSelection();
+  if (!selection || !selection.anchorNode) return;
+  const range = document.createRange();
+  const { anchorNode, focusOffset } = selection;
+  console.log(anchorNode, focusOffset);
+
   const nodeList = [node];
   while (1) {
     const prevNode = nodeList[0].previousSibling;
@@ -208,12 +214,22 @@ export function mergeSiblingTextNode(node: Text) {
     if (prevNodeIsNotTextNode && nextNodeIsNotTextNode) break;
   }
   
-  const [firstNode, ...tailNodes] = nodeList;
-  const parentNode = firstNode.parentNode as Node;
-  tailNodes.forEach(node => {
-    firstNode.appendData(node.nodeValue as string);
-    parentNode.removeChild(node);
-  });
+  const selectionNodeIndex = nodeList.indexOf(anchorNode as Text);
+  const mergedFocusOffset = nodeList.slice(0, selectionNodeIndex).reduce((acc, node) => acc += (node.nodeValue as string).length, 0) + focusOffset;
+
+  console.log('anchorNode', anchorNode, 'selectionNodeIndex', selectionNodeIndex, 'mergedFocusOffset', mergedFocusOffset)
+
+  // const [firstNode, ...tailNodes] = nodeList;
+  // const parentNode = firstNode.parentNode as Node;
+  // tailNodes.forEach(node => {
+  //   firstNode.appendData(node.nodeValue as string);
+  //   parentNode.removeChild(node);
+  // });
+
+  // range.setStart(firstNode, mergedFocusOffset);
+  // range.collapse(true);
+  // selection.removeAllRanges();
+  // selection.addRange(range);
 }
 
 export function linkTransform(ev: KeyboardEvent, parentNode: HTMLElement) {
@@ -234,12 +250,24 @@ export function linkTransform(ev: KeyboardEvent, parentNode: HTMLElement) {
     for (const node of nodes as (Node | HTMLElement)[]) {
       if (node instanceof HTMLAnchorElement) {
         if (!node.textContent?.match(HTTP_REGEX)) {
+          // compute selection
+          const selection = window.getSelection();
+          if (!selection || !selection.anchorNode) return;
+          const range = document.createRange();
+          const { anchorNode, focusOffset } = selection;
+          console.log(anchorNode, focusOffset);        
+          // compute selection
+
           // remove anchor
           const parentNode = node.parentNode as Node;
           const childNodes = [...node.childNodes];
           childNodes.forEach(childNode => parentNode.insertBefore(childNode, node));
           parentNode.removeChild(node);
           // mergeSiblingTextNode(childNodes[0] as Text);
+          range.setStart(anchorNode, focusOffset);
+          range.collapse(true);
+          selection.removeAllRanges();
+          selection.addRange(range);
         } else {
           // update href
           node.href = node.textContent;
@@ -248,7 +276,16 @@ export function linkTransform(ev: KeyboardEvent, parentNode: HTMLElement) {
         let nextTextNode: Text = node;
         let matchResult: RegExpMatchArray|null;
         while (matchResult = (nextTextNode.nodeValue ?? '').match(HTTP_REGEX)) {
-          console.log(matchResult);
+          // console.log(matchResult);
+
+          // compute selection
+          const selection = window.getSelection();
+          if (!selection || !selection.anchorNode) return;
+          const range = document.createRange();
+          const { anchorNode, focusOffset } = selection;
+          console.log(anchorNode, focusOffset);        
+          // compute selection
+
           const {'0': target, index} = matchResult as typeof matchResult & { index: number };
           const anchorTextContent = node.splitText(index);
           nextTextNode = anchorTextContent.splitText(target.length);
@@ -258,6 +295,10 @@ export function linkTransform(ev: KeyboardEvent, parentNode: HTMLElement) {
           parentNode.insertBefore(anchor, anchorTextContent);
           anchor.appendChild(anchorTextContent);
           // mergeSiblingTextNode(nextTextNode as Text);
+          range.setStart(anchorTextContent, focusOffset);
+          range.collapse(true);
+          selection.removeAllRanges();
+          selection.addRange(range);
         }
         
       }
