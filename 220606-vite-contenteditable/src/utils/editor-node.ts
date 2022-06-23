@@ -198,7 +198,7 @@ export function mergeSiblingTextNode(node: Text) {
   if (!selection || !selection.anchorNode) return;
   const range = document.createRange();
   const { anchorNode, focusOffset } = selection;
-  console.log(anchorNode, focusOffset);
+  console.log('mergeSilblingTextNode', anchorNode, focusOffset);
 
   const nodeList = [node];
   while (1) {
@@ -217,22 +217,22 @@ export function mergeSiblingTextNode(node: Text) {
   const selectionNodeIndex = nodeList.indexOf(anchorNode as Text);
   const mergedFocusOffset = nodeList.slice(0, selectionNodeIndex).reduce((acc, node) => acc += (node.nodeValue as string).length, 0) + focusOffset;
 
-  console.log('anchorNode', anchorNode, 'selectionNodeIndex', selectionNodeIndex, 'mergedFocusOffset', mergedFocusOffset)
-
-  // const [firstNode, ...tailNodes] = nodeList;
-  // const parentNode = firstNode.parentNode as Node;
-  // tailNodes.forEach(node => {
-  //   firstNode.appendData(node.nodeValue as string);
-  //   parentNode.removeChild(node);
-  // });
-
-  // range.setStart(firstNode, mergedFocusOffset);
-  // range.collapse(true);
-  // selection.removeAllRanges();
-  // selection.addRange(range);
+  const [firstNode, ...tailNodes] = nodeList;
+  const parentNode = firstNode.parentNode as Node;
+  tailNodes.forEach(node => {
+    firstNode.appendData(node.nodeValue as string);
+    parentNode.removeChild(node);
+  });
+  // console.log(firstNode, firstNode.length, mergedFocusOffset);
+  if (anchorNode !== firstNode) return;
+  range.setStart(firstNode, mergedFocusOffset);
+  range.collapse(true);
+  selection.removeAllRanges();
+  selection.addRange(range);
 }
 
 export function linkTransform(ev: KeyboardEvent, parentNode: HTMLElement) {
+
   const nodeStructs = [...parentNode.childNodes].reduce((acc, node, i, { length }) => {
     if (isHTMLElement(node) && node.tagName === 'BR') {
       i !== length - 1 && acc.push([]);
@@ -246,6 +246,10 @@ export function linkTransform(ev: KeyboardEvent, parentNode: HTMLElement) {
 
   for (const nodes of nodeStructs) {
     if (!nodes.length) continue;
+
+    for (const node of nodes) {
+      if (node instanceof Text) mergeSiblingTextNode(node);
+    }
 
     for (const node of nodes as (Node | HTMLElement)[]) {
       if (node instanceof HTMLAnchorElement) {
