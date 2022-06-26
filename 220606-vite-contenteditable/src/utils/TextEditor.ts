@@ -10,8 +10,12 @@ export type FocusParams = {
   offset: number;
 };
 
-export function isHTML<K extends keyof HTMLElementTagNameMap>(node: Node|null, tagName: K): node is HTMLElementTagNameMap[K] {
-  return node?.nodeType === 1 && (node as HTMLElement).tagName === tagName;
+export function isHTMLElement(node: Node|null): node is HTMLElement {
+  return node?.nodeType === 1;
+}
+
+export function isTag<K extends keyof HTMLElementTagNameMap>(tagName: K, node: Node|null): node is HTMLElementTagNameMap[K] {
+  return isHTMLElement(node) && node.tagName === tagName;
 }
 
 class TextEditor {
@@ -85,18 +89,19 @@ class TextEditor {
         focusNode = document.createElement('br');
         let checkBr = false;
         let computedNextNode: Node|null = nextNode;
-        while (computedNextNode = computedNextNode?.nextSibling ?? null) checkBr ||= isHTML(computedNextNode, 'br');
+        while (computedNextNode = computedNextNode?.nextSibling ?? null) checkBr ||= isTag('br', computedNextNode);
         
         input.insertBefore(focusNode, nextNode);
         
         if (!checkBr) {
-            input.insertBefore(focusNode = document.createElement('br'), nextNode);
+          input.insertBefore(focusNode = document.createElement('br'), nextNode);
         } else {
           focusNode = focusNode.nextSibling as Node;
         }
       }
+
       // Selection.anchorNode가 BR 태그가 되면 포커싱이 잡히지 않음. BR태그 대신 부모 노드에서 offset으로 선택해야 함
-      if (isHTML(focusNode, 'br')) {
+      if (isTag('br', focusNode)) {
         const focusNodeIndex = [...input.childNodes ?? []].indexOf(focusNode);
         
         return {
