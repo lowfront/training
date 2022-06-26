@@ -38,6 +38,10 @@ export function isHTMLElement(node: Node): node is HTMLElement {
   return node.nodeType === 1;
 } 
 
+export function isBr(node: Node|null): node is HTMLBRElement {
+  return node?.nodeType === 1 && (node as HTMLElement).tagName === 'BR';
+}
+
 export function isTextNode(node: Node) {
   return node.nodeType === 3;
 }
@@ -132,10 +136,6 @@ export function* nodeToEditorNodes(root: Node) {
   for (const editorNode of editorNodeIterator) {
     if (editorNode.text) yield editorNode;
   }
-}
-
-export function isBr(node: Node|null): node is HTMLBRElement {
-  return node?.nodeType === 1 && (node as HTMLElement).tagName === 'BR';
 }
 
 export function enterTransform(ev: KeyboardEvent, parentNode: HTMLElement) {
