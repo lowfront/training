@@ -33,7 +33,6 @@ class TextEditor {
   }
 
   handleKeyPress(ev: KeyboardEvent) {
-
     if (ev.code === 'Enter') this.enterTransform(ev);
 
     // debouncedLineTransform(ev, editorNode);
@@ -43,23 +42,25 @@ class TextEditor {
   }
 
   getSelection() {
-    const selection = window.getSelection();
-    if (!selection || !selection.anchorNode) throw new Error('No selection');
+    const selection = window.getSelection() as Selection;
     const { anchorNode, focusOffset } = selection;
 
-    return { selection, anchorNode, focusOffset };
+    return { anchorNode, focusOffset } as { anchorNode: Node; focusOffset: number; };
   }
-  focusNode(node: Node, offset: number, selection: Selection) {
+
+  focusNode(node: Node, offset: number) {
+    const selection = window.getSelection() as Selection;
     const range = document.createRange();
     range.setStart(node, offset);
     range.collapse(true);
     selection.removeAllRanges();
     selection.addRange(range);
   }
+
   enterTransform(ev: KeyboardEvent): FocusParams {
     ev.preventDefault();
     const { input } = this;
-    const { selection, anchorNode, focusOffset } = this.getSelection();
+    const { anchorNode, focusOffset } = this.getSelection();
   
     const isZeroWidth = input === anchorNode;
     
