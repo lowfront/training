@@ -1,5 +1,5 @@
 import Editor from "./Editor";
-import { isHTML } from "./utils";
+import { getChildNodes, getLastChildNode, isHTML, isText } from "./utils";
 
 namespace Parser {
   export function firstWrap(input: HTMLElement) {
@@ -18,6 +18,24 @@ namespace Parser {
       input.firstChild!.remove();
       Editor.focus(input, 0);
     }
+  }
+
+  export function isLast(input: HTMLElement, node: Node, offset: number) {
+    if (input === node && getChildNodes(input).length - 1 === offset)
+      return true;
+
+    let targetNode = node;
+    let isLast = isText(targetNode)
+      ? targetNode.textContent!.length === offset
+      : true;
+
+    while (isLast && input !== targetNode) {
+      isLast &&= getLastChildNode(targetNode.parentNode!) === targetNode;
+      console.log("isLast", targetNode);
+      targetNode = targetNode.parentNode!;
+    }
+
+    return isLast;
   }
 }
 
