@@ -6,7 +6,7 @@ namespace Parser {
     if (input.firstChild) {
       if (!isHTML(input.firstChild, "p")) {
         const text = input.firstChild as Text;
-        Editor.appendParagraph(input).append(text);
+        Editor.appendParagraph(input, text);
         Editor.focus(text, text.length);
       }
     }
@@ -35,6 +35,32 @@ namespace Parser {
     }
 
     return isLast;
+  }
+
+  export function isLastOfParagraph(
+    input: HTMLElement,
+    node: Node,
+    offset: number
+  ) {
+    let targetNode = node;
+    let isLast = isText(targetNode)
+      ? targetNode.textContent!.length === offset
+      : true;
+
+    while (isLast && input !== targetNode) {
+      isLast &&= getLastChildNode(targetNode.parentNode!) === targetNode;
+      console.log(isLast);
+      targetNode = targetNode.parentNode!;
+    }
+
+    return isLast;
+  }
+
+  export function getCurrentParagraph(input: HTMLElement, node: Node) {
+    let targetNode = node;
+    while (!isHTML(targetNode, "p")) targetNode = targetNode.parentNode!;
+
+    return targetNode;
   }
 }
 
