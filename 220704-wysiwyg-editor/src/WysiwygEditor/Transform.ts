@@ -1,4 +1,6 @@
 import Editor from "./Editor";
+import Parser from "./Parser";
+import { getLastChildNode } from "./utils";
 
 namespace Transform {
   export function enterTransform(input: HTMLElement, ev: KeyboardEvent) {
@@ -16,15 +18,13 @@ namespace Transform {
       focusOffset = 1;
     } else {
       // console.log(anchorNode, anchorOffset);
-      const { isLast, paragraph } = Editor.isLastParagraph(
-        input,
-        anchorNode!,
-        anchorOffset
-      );
+
+      const isLast = Parser.isLast(input, anchorNode!, anchorOffset);
 
       if (isLast) {
         // EndOfParagraph
-        const paragraphIndex = Editor.indexOf(input, paragraph);
+        const lastParagraph = getLastChildNode(input);
+        const paragraphIndex = Editor.indexOf(input, lastParagraph);
         Editor.appendParagraph(input, "", paragraphIndex + 1);
         focusOffset = paragraphIndex + 1;
       }
