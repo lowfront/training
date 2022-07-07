@@ -12,6 +12,15 @@ export function isText(node: Node): node is Text {
   return node.nodeType === 3;
 }
 
+export function getChildNodes(input: HTMLElement | Node) {
+  return [...input.childNodes];
+}
+
+export function getLastChildNode(node: Node) {
+  const childNodes = [...node.childNodes];
+  return childNodes[childNodes.length - 1];
+}
+
 export function createPromise<T>() {
   let resolve: (value: T) => void;
   return [new Promise<T>((res) => (resolve = res)), resolve!];
