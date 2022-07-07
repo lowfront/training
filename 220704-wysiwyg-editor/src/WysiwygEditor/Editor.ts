@@ -1,4 +1,4 @@
-import { getChildNodes, isHTML } from "./utils";
+import { getChildNodes, isHTML, isText } from "./utils";
 
 namespace Editor {
   export function getSelection() {
@@ -16,16 +16,26 @@ namespace Editor {
 
   export function appendParagraph(
     input: HTMLElement,
-    textContent?: string,
+    textContent?: string | Text, // if textContent is falsy, return <p><br></p>;
     insertIndex?: number
   ) {
     const p = document.createElement("p");
-    textContent && (p.textContent = textContent);
-
-    if (insertIndex === undefined) {
-      input.append(p);
+    if (textContent) {
+      if (isText(textContent)) {
+        p.appendChild(textContent);
+      } else {
+        p.appendChild(document.createTextNode(textContent));
+      }
     } else {
-      input.insertBefore(p, getChildNodes(input)[insertIndex]);
+      p.appendChild(document.createElement("br"));
+    }
+
+    const childNodes = getChildNodes(input);
+    const insertTargetNode = childNodes[insertIndex ?? -1];
+    if (insertTargetNode) {
+      input.insertBefore(p, insertTargetNode);
+    } else {
+      input.append(p);
     }
     return p;
   }
