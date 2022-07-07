@@ -8,8 +8,8 @@ export function isHTML<K extends keyof HTMLElementTagNameMap>(
   );
 }
 
-export function isText(node: Node): node is Text {
-  return node.nodeType === 3;
+export function isText(node: any): node is Text {
+  return node?.nodeType === 3;
 }
 
 export function getChildNodes(input: HTMLElement | Node) {
