@@ -8,6 +8,9 @@ namespace WysiwygEditor {
 
     if ((ev as KeyboardEvent).code === "Enter")
       Transform.enterTransform(input, ev as KeyboardEvent);
+    else {
+      Transform.linkTransform(input, ev as KeyboardEvent);
+    }
   }
   function handleKeyUp(input: HTMLElement, ev: KeyboardEvent) {
     Parser.lastWrap(input);

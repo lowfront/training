@@ -1,8 +1,31 @@
 import Editor from "./Editor";
 import Parser from "./Parser";
-import { getChildNodes, getLastChildNode, isText } from "./utils";
+import { getChildNodes, getLastChildNode, isHTML, isText } from "./utils";
 
 namespace Transform {
+  export const RegexHttp =
+    /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
+
+  export function linkTransform(input: HTMLElement, ev: KeyboardEvent) {
+    const selection = Editor.getSelection();
+    const { anchorNode, anchorOffset } = selection;
+    if (isText(anchorNode) && isHTML(anchorNode.parentNode, "p")) {
+      const text = anchorNode.nodeValue!;
+      const matchArray = text.match(RegexHttp);
+      if (!matchArray) return;
+
+      const paragraph = anchorNode.parentNode!;
+      const linkText = anchorNode.splitText(matchArray.index!);
+      linkText.splitText(matchArray[0].length);
+      const a = Object.assign(document.createElement("a"), {
+        href: linkText.nodeValue,
+      });
+      paragraph.replaceChild(a, linkText);
+      a.appendChild(linkText);
+      Editor.focus(linkText, anchorOffset - matchArray.index!);
+    }
+  }
+
   export function enterTransform(input: HTMLElement, ev: KeyboardEvent) {
     ev.preventDefault();
 
