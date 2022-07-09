@@ -29,7 +29,7 @@ namespace Transform {
   export function enterTransform(input: HTMLElement, ev: KeyboardEvent) {
     ev.preventDefault();
 
-    const selection = Editor.getSelection()!;
+    const selection = Editor.getSelection();
     const { anchorNode, anchorOffset } = selection;
 
     let focusNode: Node = input;
