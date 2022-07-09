@@ -2,7 +2,12 @@ import { getChildNodes, isHTML, isText } from "./utils";
 
 namespace Editor {
   export function getSelection() {
-    return window.getSelection();
+    const test: Selection = 0 as any;
+
+    return window.getSelection() as Selection & {
+      anchorNode: Node;
+      focusNode: Node;
+    };
   }
 
   export function focus(node: Node, offset: number) {
