@@ -6,10 +6,14 @@ namespace WysiwygEditor {
   function handleKeyDown(input: HTMLElement, ev: InputEvent) {
     Parser.firstWrap(input);
 
-    if ((ev as KeyboardEvent).code === "Enter")
-      Transform.enterTransform(input, ev as KeyboardEvent);
-    else {
-      Transform.linkTransform(input, ev as KeyboardEvent);
+    if (ev.inputType === "insertParagraph") Transform.enterTransform(input, ev);
+    else if (
+      ev.inputType === "deleteContentBackward" ||
+      ev.inputType === "deleteContentForward"
+    ) {
+      Transform.deleteTransform(input, ev);
+    } else {
+      Transform.linkTransform(input, ev);
     }
   }
   function handleKeyUp(input: HTMLElement, ev: KeyboardEvent) {

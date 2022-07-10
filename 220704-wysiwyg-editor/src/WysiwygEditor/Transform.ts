@@ -6,7 +6,7 @@ namespace Transform {
   export const RegexHttp =
     /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
 
-  export function linkTransform(input: HTMLElement, ev: KeyboardEvent) {
+  export function linkTransform(input: HTMLElement, ev: InputEvent) {
     const selection = Editor.getSelection();
     const { anchorNode, anchorOffset } = selection;
     if (isText(anchorNode) && isHTML(anchorNode.parentNode, "p")) {
@@ -46,7 +46,7 @@ namespace Transform {
     }
   }
 
-  export function enterTransform(input: HTMLElement, ev: KeyboardEvent) {
+  export function enterTransform(input: HTMLElement, ev: InputEvent) {
     ev.preventDefault();
 
     const selection = Editor.getSelection();
@@ -107,6 +107,12 @@ namespace Transform {
     }
 
     Editor.focus(focusNode, focusOffset);
+  }
+
+  export function deleteTransform(input: HTMLElement, ev: InputEvent) {
+    if (ev.inputType === "deleteContentBackward") {
+    } else if (ev.inputType === "deleteContentForward") {
+    }
   }
 }
 
