@@ -3,7 +3,7 @@ import Transform from "./Transform";
 import "./index.css";
 
 namespace WysiwygEditor {
-  function handleKeyDown(input: HTMLElement, ev: Event) {
+  function handleKeyDown(input: HTMLElement, ev: InputEvent) {
     Parser.firstWrap(input);
 
     if ((ev as KeyboardEvent).code === "Enter")
@@ -36,12 +36,12 @@ namespace WysiwygEditor {
     const handleKeyUp = createHandleKeyUp(input);
     const handlePaste = createHandlePaste(input);
 
-    input.addEventListener("input", handleKeyDown);
+    input.addEventListener("input", handleKeyDown as any);
     input.addEventListener("keyup", handleKeyUp);
     input.addEventListener("paste", handlePaste);
 
     return function destory() {
-      input.removeEventListener("keydown", handleKeyDown);
+      input.removeEventListener("input", handleKeyDown as any);
       input.removeEventListener("keyup", handleKeyUp);
       input.removeEventListener("paste", handlePaste);
     };
