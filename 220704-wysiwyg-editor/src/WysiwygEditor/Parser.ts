@@ -49,7 +49,6 @@ namespace Parser {
 
     while (isLast && input !== targetNode) {
       isLast &&= getLastChildNode(targetNode.parentNode!) === targetNode;
-      console.log(isLast);
       targetNode = targetNode.parentNode!;
     }
 
