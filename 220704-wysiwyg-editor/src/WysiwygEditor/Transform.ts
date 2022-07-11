@@ -55,7 +55,7 @@ namespace Transform {
     let focusNode: Node = input;
     let focusOffset: number = -1;
 
-    console.log(anchorNode, anchorOffset);
+    // console.log(anchorNode, anchorOffset);
 
     if (anchorNode === input && !input.firstChild) {
       // Enter in first
@@ -95,7 +95,6 @@ namespace Transform {
           focusOffset = 0;
         }
       } else {
-        console.log("not text");
         const newParagraph = Editor.appendParagraph(
           input,
           "",
@@ -110,8 +109,59 @@ namespace Transform {
   }
 
   export function deleteTransform(input: HTMLElement, ev: InputEvent) {
-    if (ev.inputType === "deleteContentBackward") {
-    } else if (ev.inputType === "deleteContentForward") {
+    const selection = Editor.getSelection();
+    const { anchorNode, anchorOffset } = selection;
+
+    let anchorElement: HTMLAnchorElement | null = null;
+    let anchorHref: string = "";
+    if (isText(anchorNode) && isHTML(anchorNode.parentNode, "a")) {
+      anchorElement = anchorNode.parentNode;
+      anchorHref = anchorNode.nodeValue!;
+    } else if (
+      ev.inputType === "deleteContentBackward" ||
+      ev.inputType === "deleteWordBackward"
+    ) {
+      // backspace
+      console.log("down backspace");
+      if (
+        isText(anchorNode) &&
+        isHTML(anchorNode.previousSibling, "a") &&
+        anchorOffset === 0
+      ) {
+        console.log("previous HTMLAnchorElement");
+      }
+    } else if (
+      ev.inputType === "deleteContentForward" ||
+      ev.inputType === "deleteWordForward"
+    ) {
+      // delete
+      if (
+        isText(anchorNode) &&
+        isHTML(anchorNode.nextSibling, "a") &&
+        anchorOffset === anchorNode.nodeValue!.length
+      ) {
+        anchorElement = anchorNode.nextSibling;
+        anchorHref = anchorNode.nextSibling.textContent!;
+      }
+    }
+
+    if (!anchorElement) return;
+
+    if (RegexHttp.test(anchorHref)) {
+      // new link
+      anchorElement.href = anchorHref;
+    } else {
+      // not link
+      const childNodes = [...anchorElement.childNodes];
+      childNodes.forEach((child) => anchorElement!.removeChild(child));
+      childNodes
+        .reverse()
+        .forEach((child) =>
+          anchorElement!.parentNode!.insertBefore(child, anchorElement)
+        );
+      anchorElement!.parentNode!.removeChild(anchorElement!);
+
+      Editor.focus(anchorNode, anchorOffset);
     }
   }
 }
