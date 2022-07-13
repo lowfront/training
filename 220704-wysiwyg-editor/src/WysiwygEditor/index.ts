@@ -1,13 +1,10 @@
 import Parser from "./Parser";
 import Transform from "./Transform";
 import "./index.css";
+import Editor from "./Editor";
 
 namespace WysiwygEditor {
   function handleKeyDown(input: HTMLElement, ev: InputEvent) {
-    Parser.firstWrap(input);
-
-    // console.log("ev type", ev.inputType);
-
     if (ev.inputType === "insertParagraph") Transform.enterTransform(input, ev);
     else if (
       ev.inputType === "deleteContentBackward" ||
@@ -19,10 +16,9 @@ namespace WysiwygEditor {
     } else {
       Transform.linkTransform(input, ev);
     }
+    Transform.lastWrap(input);
   }
-  function handleKeyUp(input: HTMLElement, ev: KeyboardEvent) {
-    Parser.lastWrap(input);
-  }
+  function handleKeyUp(input: HTMLElement, ev: KeyboardEvent) {}
 
   function createHandleKeyDown(input: HTMLElement) {
     return handleKeyDown.bind(null, input);
@@ -39,6 +35,8 @@ namespace WysiwygEditor {
   export function create(input: HTMLElement) {
     input.className = "wysiwyg-editor";
     input.contentEditable = "true";
+
+    Transform.initWrap(input);
 
     const handleKeyDown = createHandleKeyDown(input);
     const handleKeyUp = createHandleKeyUp(input);
