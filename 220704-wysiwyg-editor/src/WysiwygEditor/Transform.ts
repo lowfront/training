@@ -3,6 +3,16 @@ import Parser from "./Parser";
 import { getChildNodes, getLastChildNode, isHTML, isText } from "./utils";
 
 namespace Transform {
+  export function initWrap(input: HTMLElement) {
+    lastWrap(input);
+  }
+
+  export function lastWrap(input: HTMLElement) {
+    if (getChildNodes(input).length === 0) {
+      Editor.appendParagraph(input);
+    }
+  }
+
   export const RegexHttp =
     /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
 
