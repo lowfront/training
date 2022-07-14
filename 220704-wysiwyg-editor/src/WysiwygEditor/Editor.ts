@@ -11,7 +11,7 @@ namespace Editor {
   }
 
   export function focus(node: Node, offset: number) {
-    const selection = getSelection()!;
+    const selection = getSelection();
     const range = document.createRange();
     range.setStart(node, offset);
     range.collapse(true);
