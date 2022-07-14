@@ -124,6 +124,55 @@ namespace Transform {
       Editor.focus(anchorNode, anchorOffset);
     }
   }
+
+  export function deepSplit(parent: Node, targetText: Text, offset: number) {
+    if (offset === 0 || offset === targetText.length) {
+      throw new Error('Invalid offset.');
+    }
+
+    const splitedText = targetText.splitText(offset);
+    let target: Node = splitedText;
+
+    let clonedParent: Node|null = null;
+    while (target.parentNode !== parent) {
+      // 부모 복제가 일어나면 이전 부모 append
+      if (clonedParent) {
+        const clone = target.parentNode!.cloneNode(false);
+        clone.appendChild(clonedParent);
+        clonedParent = clone;
+      } else {
+        clonedParent = target.parentNode!.cloneNode(false);
+      }
+
+      let targetSibling: Node|null = target.nextSibling;
+      const currentParentNode = target.parentNode!;
+
+      // 나누는 대상 텍스트는 clonedParent의 자식이 됨
+      if (target === splitedText) clonedParent.appendChild(target);
+
+      target = currentParentNode;
+      
+      // 나누는 대상 텍스트의 부모는 원본 텍스트를 위해 남겨두고 형제 노드만 clonedParent의 자식이 됨
+      while (targetSibling) {
+        clonedParent.appendChild(targetSibling);
+        targetSibling = targetSibling.nextSibling;
+      }
+
+    }
+
+    if (clonedParent) {
+      insertAfter(clonedParent, target);
+    }
+
+    const result: Node[] = [];
+    let targetSibling: Node|null = clonedParent;
+    while (targetSibling) {
+      result.push(targetSibling);
+      targetSibling = targetSibling.nextSibling;
+    }
+
+    return result;
+  }
 }
 
 export default Transform;
