@@ -1,6 +1,6 @@
 import Editor from "./Editor";
 import Parser from "./Parser";
-import { getChildNodes, getLastChildNode, insertAfter, isHTML, isText } from "./utils";
+import { getChildNodes, getLastChildNode, insertAfter, isHTML, isText, isWrappedInTag, removeIfEmpty } from "./utils";
 
 namespace Transform {
   export function initWrap(input: HTMLElement) {
@@ -19,6 +19,59 @@ namespace Transform {
   export function linkTransform(input: HTMLElement, ev: InputEvent) {
     const selection = Editor.getSelection();
     const { anchorNode, anchorOffset } = selection;
+
+    if (isText(anchorNode) && !isWrappedInTag(anchorNode, 'a')) {
+      const paragraph = Parser.getCurrentParagraph(input, anchorNode);
+      const textNodes = Parser.getConnectedTextNodes(paragraph, anchorNode);
+      const textContent = textNodes.reduce((acc, { data }) => acc + data, '');
+      console.log('textContent', textContent);
+      const matchArray = textContent.match(RegexHttp);
+      if (!matchArray) return;
+
+      const { 0: linkText, index } = matchArray as RegExpMatchArray & { index: number };
+
+      let length = index;
+      let linkStart!: Text;
+      let linkStartOffset!: number;
+      let linkEnd!: Text;
+      let linkEndOffset!: number;
+      for (const text of textNodes) {
+        const textLength = text.data.length;
+        if (!linkStart && textLength - length > 0) {
+          linkStart = text;
+          linkStartOffset = length;
+        }
+
+        if (textLength - (length + linkText.length) >= 0) {
+          linkEnd = text;
+          linkEndOffset = length + linkText.length;
+          break;
+        }
+
+        length -= textLength;
+      }
+      console.log('textNodes', textNodes);
+      console.log('linkStart', linkStart.data, linkStartOffset);
+      console.log('linkEnd', linkEnd.data, linkEndOffset);
+      
+      const startSplitedNodeArray = deepSplit(paragraph, linkStart, linkStartOffset);
+
+      if (linkStart === linkEnd) {
+        console.log('same link node')
+        linkEnd = startSplitedNodeArray[0] as Text;
+        linkEndOffset = linkText.length;
+      }
+      console.log('linkEnd2', linkEnd.data, linkEndOffset);
+
+      const endSplitedNodeArray = deepSplit(paragraph, linkEnd, linkEndOffset);
+
+      console.log('startSplitedNodeArray', startSplitedNodeArray)
+      console.log('endSplitedNodeArray', endSplitedNodeArray)
+
+      // FIXME: end split 이후 포커싱 문제: 1. deepSplit 이후 새 포커싱 위치 계산 + deepSplit작업이 완료되면 다시 일어나지 않도록 처리, 2. 역방향 deepSplit
+    }
+    return;
+
     if (isText(anchorNode) && isHTML(anchorNode.parentNode, "p")) {
       if (
         isHTML(anchorNode.previousSibling, "a") &&
@@ -142,6 +195,7 @@ namespace Transform {
     let target: Node = splitedText;
 
     let clonedParent: Node|null = null;
+    // FIXME: splitedText.data가 없고 자식이 하나도 없으면 clonedParent를 생성하지 않아야 함
     while (target.parentNode !== parent) {
       // 부모 복제가 일어나면 이전 부모 append
       if (clonedParent) {
@@ -179,6 +233,19 @@ namespace Transform {
       targetSibling = targetSibling.nextSibling;
     }
 
+    if (!targetText.length) {
+      const currentParent = targetText.parentNode!;
+      targetText.remove();
+      removeIfEmpty(parent, currentParent);
+    }
+    if (!splitedText.length) {
+      const currentParent = targetText.parentNode!;
+      splitedText.remove();
+      removeIfEmpty(parent, currentParent);
+      // if (result.includes(splitedText)) {
+      //   result.splice(result.indexOf(splitedText), 1);
+      // }
+    }
     return result;
   }
 }
