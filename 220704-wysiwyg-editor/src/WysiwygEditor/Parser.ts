@@ -54,7 +54,7 @@ namespace Parser {
         if (cursorNode !== target) {
           result.unshift(target);
 
-          if (target.data.includes(' ')) {
+          if (/\s/.test(target.data)) {
             break;
           }
         }
@@ -86,7 +86,7 @@ namespace Parser {
         if (cursorNode !== target) {
           result.unshift(target);
 
-          if (target.data.includes(' ')) {
+          if (/\s/.test(target.data)) {
             break;
           }
         }
