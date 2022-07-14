@@ -126,10 +126,9 @@ namespace Transform {
   }
 
   export function deepSplit(parent: Node, targetText: Text, offset: number) {
-    if (offset === 0 || offset === targetText.length) {
-      throw new Error('Invalid offset.');
-    }
-
+    if (offset === 0) return [...parent.childNodes];
+    if (offset === targetText.length) return [];
+    
     const splitedText = targetText.splitText(offset);
     let target: Node = splitedText;
 
