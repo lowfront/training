@@ -43,6 +43,77 @@ namespace Parser {
 
     return targetNode;
   }
+
+  function getTextNodesConnectedPrevious(parent: HTMLParagraphElement, cursorNode: Text) {
+    const stack: Node[] = [cursorNode];
+    const result = [];
+
+    let target: Node;
+    while (target = stack.shift()!) {
+      if (isText(target)) {
+        if (cursorNode !== target) {
+          result.unshift(target);
+
+          if (target.data.includes(' ')) {
+            break;
+          }
+        }
+
+        if (target.previousSibling) {
+          stack.push(target.previousSibling);
+        } else {
+          let parentNode = target.parentNode!;
+          while (!parentNode.previousSibling && parent !== parentNode) parentNode = parentNode.parentNode!
+
+          if (parentNode.previousSibling) stack.push(parentNode.previousSibling);
+        }
+      } else {
+        if (target.lastChild) {
+          stack.push(target.lastChild);
+        }
+      }
+    }
+  }
+  function getTextNodesConnectedNext(parent: HTMLParagraphElement, cursorNode: Text) {
+    const stack: Node[] = [cursorNode];
+    const result = [];
+
+    let target: Node;
+    while (target = stack.shift()!) {
+      if (isText(target)) {
+        if (cursorNode !== target) {
+          result.unshift(target);
+
+          if (target.data.includes(' ')) {
+            break;
+          }
+        }
+
+        if (target.nextSibling) {
+          stack.push(target.nextSibling);
+        } else {
+          let parentNode = target.parentNode!;
+          while (!parentNode.nextSibling && parent !== parentNode) parentNode = parentNode.parentNode!
+
+          if (parentNode.nextSibling) stack.push(parentNode.nextSibling);
+        }
+      } else {
+        if (target.firstChild) {
+          stack.push(target.firstChild);
+        }
+      }
+    }
+  }
+
+  export function getConnectedTextNodes(parent: HTMLParagraphElement, cursorNode: Text) {
+    const result = [
+      getTextNodesConnectedPrevious(parent, cursorNode),
+      cursorNode,
+      getTextNodesConnectedNext(parent, cursorNode)
+    ];
+
+    return result;
+  }
 }
 
 export default Parser;
