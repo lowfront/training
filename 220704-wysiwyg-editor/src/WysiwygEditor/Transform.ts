@@ -124,10 +124,20 @@ namespace Transform {
       Editor.focus(anchorNode, anchorOffset);
     }
   }
+  export function cleanEmpty(input: HTMLElement) {
+    const selection = Editor.getSelection();
+    const { anchorNode, anchorOffset } = selection;
+    const paragraph = Parser.getCurrentParagraph(input, anchorNode);
 
+    paragraph.childNodes.forEach(childNode => {
+      if (childNode.nodeType === 1) {
+        removeIfEmpty(input, childNode);
+      } else if (isText(childNode)) {
+        if (!childNode.data.length) childNode.remove();
+      }
+    })
+  }
   export function deepSplit(parent: Node, targetText: Text, offset: number) {
-    if (offset === targetText.length) return [];
-    
     const splitedText = targetText.splitText(offset);
     let target: Node = splitedText;
 
