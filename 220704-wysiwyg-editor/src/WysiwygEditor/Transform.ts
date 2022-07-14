@@ -1,6 +1,6 @@
 import Editor from "./Editor";
 import Parser from "./Parser";
-import { getChildNodes, getLastChildNode, isHTML, isText } from "./utils";
+import { getChildNodes, getLastChildNode, insertAfter, isHTML, isText } from "./utils";
 
 namespace Transform {
   export function initWrap(input: HTMLElement) {

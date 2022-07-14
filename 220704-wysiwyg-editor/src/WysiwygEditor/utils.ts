@@ -25,3 +25,11 @@ export function createPromise<T>() {
   let resolve: (value: T) => void;
   return [new Promise<T>((res) => (resolve = res)), resolve!];
 }
+
+export function insertAfter(node: Node, child: Node, parent: Node = child.parentNode!) {
+  if (child.nextSibling) {
+    parent.insertBefore(node, child.nextSibling);
+  } else {
+    parent.appendChild(node);
+  }
+}
