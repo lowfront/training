@@ -33,3 +33,19 @@ export function insertAfter(node: Node, child: Node, parent: Node = child.parent
     parent.appendChild(node);
   }
 }
+
+export function isWrappedInTag(node: Node, tagName: string) {
+  while (node) {
+    if ((node.parentNode as HTMLElement)?.tagName === tagName.toUpperCase()) return true;
+    node = node.parentNode!;
+  }
+  return false;
+}
+
+export function removeIfEmpty(parent: Node, node: Node) {
+  while (node && node !== parent) {
+    if (node.firstChild) break;
+    node.parentNode!.removeChild(node);
+    node = node.parentNode!;
+  }
+}
