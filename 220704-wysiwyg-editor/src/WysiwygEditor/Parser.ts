@@ -44,7 +44,7 @@ namespace Parser {
     return targetNode;
   }
 
-  function getTextNodesConnectedPrevious(parent: HTMLParagraphElement, cursorNode: Text) {
+  function getTextNodesConnectedPrevious(parent: HTMLElement, cursorNode: Text) {
     const stack: Node[] = [cursorNode];
     const result = [];
 
@@ -76,7 +76,7 @@ namespace Parser {
 
     return result;
   }
-  function getTextNodesConnectedNext(parent: HTMLParagraphElement, cursorNode: Text) {
+  function getTextNodesConnectedNext(parent: HTMLElement, cursorNode: Text) {
     const stack: Node[] = [cursorNode];
     const result = [];
 
@@ -109,7 +109,7 @@ namespace Parser {
     return result;
   }
 
-  export function getConnectedTextNodes(parent: HTMLParagraphElement, cursorNode: Text) {
+  export function getConnectedTextNodes(parent: HTMLElement, cursorNode: Text) {
     const result = [
       ...getTextNodesConnectedPrevious(parent, cursorNode),
       cursorNode,
