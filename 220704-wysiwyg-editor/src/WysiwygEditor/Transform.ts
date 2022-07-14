@@ -165,7 +165,7 @@ namespace Transform {
     }
 
     const result: Node[] = [];
-    let targetSibling: Node|null = clonedParent;
+    let targetSibling: Node|null = clonedParent ?? splitedText;
     while (targetSibling) {
       result.push(targetSibling);
       targetSibling = targetSibling.nextSibling;
