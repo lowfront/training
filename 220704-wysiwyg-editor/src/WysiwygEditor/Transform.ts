@@ -67,8 +67,16 @@ namespace Transform {
 
       console.log('startSplitedNodeArray', startSplitedNodeArray)
       console.log('endSplitedNodeArray', endSplitedNodeArray)
+      const linkChildNodes = startSplitedNodeArray.filter(item => !endSplitedNodeArray.includes(item));
 
-      // FIXME: end split 이후 포커싱 문제: 1. deepSplit 이후 새 포커싱 위치 계산 + deepSplit작업이 완료되면 다시 일어나지 않도록 처리, 2. 역방향 deepSplit
+      console.log('[linkChildNodes]', linkChildNodes);
+
+      if (!linkChildNodes.length) return;
+
+      const a = document.createElement('a');
+      a.href = linkChildNodes.reduce((acc, { textContent }) => acc + textContent, '');
+      paragraph.insertBefore(a, linkChildNodes[0]);
+      linkChildNodes.forEach(node => a.appendChild(node));
     }
     return;
 
