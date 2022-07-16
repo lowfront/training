@@ -21,6 +21,46 @@ export function getLastChildNode(node: Node) {
   return childNodes[childNodes.length - 1];
 }
 
+export function previousSiblingTextDeep(root: HTMLElement, node: Node) {
+  if (!node) throw 'Invalid node';
+
+  let target = node;
+  while (target) {
+    if (target.previousSibling) {
+      const previousSibling = target.previousSibling;
+      if (isText(previousSibling)) return previousSibling;
+      else {
+        let lastChild = previousSibling.lastChild;
+        if (lastChild) {
+          while (lastChild) {
+            if (isText(lastChild)) {
+              return lastChild;
+            } else {
+              if (lastChild.lastChild) lastChild = lastChild.lastChild;
+              else {
+                target = lastChild;
+                break;
+              }
+            }
+          }
+        } else {
+          target = previousSibling;
+          continue;
+        }
+      }
+    } else {
+      if (target.parentNode === root) return null;
+      let parentNode = target.parentNode!;
+      while (!parentNode.previousSibling && root !== parentNode.parentNode) parentNode = parentNode.parentNode!
+      target = parentNode;
+    }
+  }
+}
+
+export function nextSiblingTextDeep() {
+
+}
+
 export function createPromise<T>() {
   let resolve: (value: T) => void;
   return [new Promise<T>((res) => (resolve = res)), resolve!];
