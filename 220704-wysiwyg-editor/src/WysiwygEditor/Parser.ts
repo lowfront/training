@@ -45,6 +45,8 @@ namespace Parser {
   }
 
   function getTextNodesConnectedPrevious(parent: HTMLElement, cursorNode: Text) {
+    if (cursorNode.data[0] === ' ') return [];
+
     const stack: Node[] = [cursorNode];
     const result = [];
 
@@ -77,6 +79,8 @@ namespace Parser {
     return result;
   }
   function getTextNodesConnectedNext(parent: HTMLElement, cursorNode: Text) {
+    if (cursorNode.data[cursorNode.data.length - 1] === ' ') return [];
+
     const stack: Node[] = [cursorNode];
     const result = [];
 
