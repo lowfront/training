@@ -92,43 +92,6 @@ namespace Transform {
       paragraph.insertBefore(a, linkChildNodes[0]);
       linkChildNodes.forEach(node => a.appendChild(node));
     }
-    return;
-
-    if (isText(anchorNode) && isHTML(anchorNode.parentNode, "p")) {
-      if (
-        isHTML(anchorNode.previousSibling, "a") &&
-        anchorOffset === 1 &&
-        (ev as any).data !== " "
-      ) {
-        // link merge
-        const a = anchorNode.previousSibling;
-        if (!RegexHttp.test(a.textContent + anchorNode.nodeValue!)) return;
-
-        if (anchorNode.nodeValue!.length > 1) {
-          anchorNode.splitText(1);
-        }
-        const paragraph = anchorNode.parentNode!;
-        paragraph.removeChild(anchorNode);
-        a.textContent += anchorNode.nodeValue!;
-        a.href = a.textContent!;
-        Editor.focus(a.firstChild!, a.firstChild!.nodeValue!.length);
-      } else {
-        // link transform
-        const text = anchorNode.nodeValue!;
-        const matchArray = text.match(RegexHttp);
-        if (!matchArray) return;
-
-        const paragraph = anchorNode.parentNode!;
-        const linkText = anchorNode.splitText(matchArray.index!);
-        linkText.splitText(matchArray[0].length);
-        const a = Object.assign(document.createElement("a"), {
-          href: linkText.nodeValue,
-        });
-        paragraph.replaceChild(a, linkText);
-        a.appendChild(linkText);
-        Editor.focus(linkText, anchorOffset - matchArray.index!);
-      }
-    }
   }
 
   export function enterTransform(input: HTMLElement, ev: InputEvent) {
