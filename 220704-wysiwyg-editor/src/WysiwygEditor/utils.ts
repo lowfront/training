@@ -21,7 +21,8 @@ export function getLastChildNode(node: Node) {
   return childNodes[childNodes.length - 1];
 }
 
-export function findPreviousSiblingDeep(root: HTMLElement, node: Node, f: (node: Node) => boolean) {
+// FIXME: 구조 정리 및 최적화 고민
+export function isPreviousSiblingDeep(root: HTMLElement, node: Node, f: (node: Node) => boolean) {
   if (!node) throw 'Invalid node';
 
   let target = node;
