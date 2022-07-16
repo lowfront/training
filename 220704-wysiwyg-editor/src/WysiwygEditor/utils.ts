@@ -99,7 +99,7 @@ export function findNextSiblingDeep(root: HTMLElement, node: Node, f: (node: Nod
   return null;
 }
 
-export function previousSiblingTextDeep(root: HTMLElement, node: Node) {
+export function previousSiblingTextDeep(root: HTMLElement, node: Node): Node | null {
   if (!node) throw 'Invalid node';
 
   let target = node;
@@ -133,9 +133,11 @@ export function previousSiblingTextDeep(root: HTMLElement, node: Node) {
       target = parentNode;
     }
   }
+
+  return null;
 }
 
-export function nextSiblingTextDeep(root: HTMLElement, node: Node) {
+export function nextSiblingTextDeep(root: HTMLElement, node: Node): Node | null {
   if (!node) throw 'Invalid node';
 
   let target = node;
@@ -169,6 +171,8 @@ export function nextSiblingTextDeep(root: HTMLElement, node: Node) {
       target = parentNode;
     }
   }
+
+  return null;
 }
 
 export function createPromise<T>() {
