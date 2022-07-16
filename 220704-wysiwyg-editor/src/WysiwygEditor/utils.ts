@@ -58,6 +58,43 @@ export function isPreviousSiblingDeep(root: HTMLElement, node: Node, f: (node: N
   }
 }
 
+// FIXME: 구조 정리 및 최적화 고민
+export function isNextSiblingDeep(root: HTMLElement, node: Node, f: (node: Node) => boolean) {
+  if (!node) throw 'Invalid node';
+
+  let target = node;
+  while (target) {
+    if (target.nextSibling) {
+      const nextSibling = target.nextSibling;
+      if (f(nextSibling)) return nextSibling;
+      else {
+        let firstChild = nextSibling.firstChild;
+        if (firstChild) {
+          while (firstChild) {
+            if (f(firstChild)) {
+              return firstChild;
+            } else {
+              if (firstChild.firstChild) firstChild = firstChild.firstChild;
+              else {
+                target = firstChild;
+                break;
+              }
+            }
+          }
+        } else {
+          target = nextSibling;
+          continue;
+        }
+      }
+    } else {
+      if (target.parentNode === root) return null;
+      let parentNode = target.parentNode!;
+      while (!parentNode.nextSibling && root !== parentNode.parentNode) parentNode = parentNode.parentNode!
+      target = parentNode;
+    }
+  }
+}
+
 export function previousSiblingTextDeep(root: HTMLElement, node: Node) {
   if (!node) throw 'Invalid node';
 
