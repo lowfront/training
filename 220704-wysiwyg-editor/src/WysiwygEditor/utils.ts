@@ -21,6 +21,42 @@ export function getLastChildNode(node: Node) {
   return childNodes[childNodes.length - 1];
 }
 
+export function findPreviousSiblingDeep(root: HTMLElement, node: Node, f: (node: Node) => boolean) {
+  if (!node) throw 'Invalid node';
+
+  let target = node;
+  while (target) {
+    if (target.previousSibling) {
+      const previousSibling = target.previousSibling;
+      if (f(previousSibling)) return previousSibling;
+      else {
+        let lastChild = previousSibling.lastChild;
+        if (lastChild) {
+          while (lastChild) {
+            if (f(lastChild)) {
+              return lastChild;
+            } else {
+              if (lastChild.lastChild) lastChild = lastChild.lastChild;
+              else {
+                target = lastChild;
+                break;
+              }
+            }
+          }
+        } else {
+          target = previousSibling;
+          continue;
+        }
+      }
+    } else {
+      if (target.parentNode === root) return null;
+      let parentNode = target.parentNode!;
+      while (!parentNode.previousSibling && root !== parentNode.parentNode) parentNode = parentNode.parentNode!
+      target = parentNode;
+    }
+  }
+}
+
 export function previousSiblingTextDeep(root: HTMLElement, node: Node) {
   if (!node) throw 'Invalid node';
 
@@ -57,8 +93,40 @@ export function previousSiblingTextDeep(root: HTMLElement, node: Node) {
   }
 }
 
-export function nextSiblingTextDeep() {
+export function nextSiblingTextDeep(root: HTMLElement, node: Node) {
+  if (!node) throw 'Invalid node';
 
+  let target = node;
+  while (target) {
+    if (target.nextSibling) {
+      const nextSibling = target.nextSibling;
+      if (isText(nextSibling)) return nextSibling;
+      else {
+        let firstChild = nextSibling.firstChild;
+        if (firstChild) {
+          while (firstChild) {
+            if (isText(firstChild)) {
+              return firstChild;
+            } else {
+              if (firstChild.firstChild) firstChild = firstChild.firstChild;
+              else {
+                target = firstChild;
+                break;
+              }
+            }
+          }
+        } else {
+          target = nextSibling;
+          continue;
+        }
+      }
+    } else {
+      if (target.parentNode === root) return null;
+      let parentNode = target.parentNode!;
+      while (!parentNode.nextSibling && root !== parentNode.parentNode) parentNode = parentNode.parentNode!
+      target = parentNode;
+    }
+  }
 }
 
 export function createPromise<T>() {
