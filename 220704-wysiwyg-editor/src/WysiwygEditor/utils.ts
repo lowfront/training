@@ -22,7 +22,7 @@ export function getLastChildNode(node: Node) {
 }
 
 // FIXME: 구조 정리 및 최적화 고민
-export function isPreviousSiblingDeep(root: HTMLElement, node: Node, f: (node: Node) => boolean) {
+export function findPreviousSiblingDeep(root: HTMLElement, node: Node, f: (node: Node) => boolean): Node | null {
   if (!node) throw 'Invalid node';
 
   let target = node;
@@ -56,10 +56,12 @@ export function isPreviousSiblingDeep(root: HTMLElement, node: Node, f: (node: N
       target = parentNode;
     }
   }
+
+  return null;
 }
 
 // FIXME: 구조 정리 및 최적화 고민
-export function isNextSiblingDeep(root: HTMLElement, node: Node, f: (node: Node) => boolean) {
+export function findNextSiblingDeep(root: HTMLElement, node: Node, f: (node: Node) => boolean): Node | null {
   if (!node) throw 'Invalid node';
 
   let target = node;
@@ -93,6 +95,8 @@ export function isNextSiblingDeep(root: HTMLElement, node: Node, f: (node: Node)
       target = parentNode;
     }
   }
+
+  return null;
 }
 
 export function previousSiblingTextDeep(root: HTMLElement, node: Node) {
