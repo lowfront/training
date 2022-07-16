@@ -1,5 +1,5 @@
 import Editor from "./Editor";
-import { isPreviousSiblingDeep, getChildNodes, getLastChildNode, isHTML, isText, isNextSiblingDeep } from "./utils";
+import { findPreviousSiblingDeep, getChildNodes, getLastChildNode, isHTML, isText, findNextSiblingDeep } from "./utils";
 
 namespace Parser {
   export function isLast(input: HTMLElement, node: Node, offset: number) {
@@ -47,7 +47,7 @@ namespace Parser {
   // FIXME: 가드 처리 위치 고민 필요
   function getTextNodesConnectedPrevious(parent: HTMLElement, cursorNode: Text) {
     if (cursorNode.data[0] === ' ') return [];
-    if (isPreviousSiblingDeep(parent, cursorNode, node => isHTML(node, 'a'))) return [];
+    if (findPreviousSiblingDeep(parent, cursorNode, node => isHTML(node, 'a'))) return [];
 
     const stack: Node[] = [cursorNode];
     const result = [];
@@ -84,7 +84,7 @@ namespace Parser {
   // FIXME: 가드 처리 위치 고민 필요
   function getTextNodesConnectedNext(parent: HTMLElement, cursorNode: Text) {
     if (cursorNode.data[cursorNode.data.length - 1] === ' ') return [];
-    if (isNextSiblingDeep(parent, cursorNode, node => isHTML(node, 'a'))) return [];
+    if (findNextSiblingDeep(parent, cursorNode, node => isHTML(node, 'a'))) return [];
 
     const stack: Node[] = [cursorNode];
     const result = [];
