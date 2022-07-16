@@ -1,6 +1,6 @@
 import Editor from "./Editor";
 import Parser from "./Parser";
-import { getChildNodes, getLastChildNode, insertAfter, isHTML, isText, isWrappedInTag, removeIfEmpty } from "./utils";
+import { findPreviousSiblingDeep, getChildNodes, getLastChildNode, insertAfter, isHTML, isText, isWrappedInTag, previousSiblingTextDeep, removeIfEmpty } from "./utils";
 
 namespace Transform {
   export function initWrap(input: HTMLElement) {
@@ -19,9 +19,23 @@ namespace Transform {
   export function linkTransform(input: HTMLElement, ev: InputEvent) {
     const selection = Editor.getSelection();
     const { anchorNode, anchorOffset } = selection;
+    
+    const paragraph = Parser.getCurrentParagraph(input, anchorNode);
+    const a = findPreviousSiblingDeep(paragraph, anchorNode, node => isHTML(node, 'a')) as HTMLAnchorElement|null;
+    if (isText(anchorNode) && !/^\s$/.test(anchorNode.data) && anchorNode.data.length === 1 && a) {
+      // link merge
+      if (RegexHttp.test(a.textContent + anchorNode.data)) {
+        const char = anchorNode.splitText(0);
+        const textNode = previousSiblingTextDeep(paragraph,anchorNode) as Text;
+        console.log(textNode, char);
+        textNode.data += char.data;
+        char.remove();
+
+        return;
+      }
+    }
 
     if (isText(anchorNode) && !isWrappedInTag(anchorNode, 'a')) {
-      const paragraph = Parser.getCurrentParagraph(input, anchorNode);
       const textNodes = Parser.getConnectedTextNodes(paragraph, anchorNode);
       const textContent = textNodes.reduce((acc, { data }) => acc + data, '');
       console.log('textContent', textContent);
