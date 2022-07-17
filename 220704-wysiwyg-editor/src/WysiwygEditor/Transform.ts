@@ -217,6 +217,8 @@ namespace Transform {
     const startIndex = htmlData.indexOf(START_FRAGMENT) + START_FRAGMENT.length;
     const endIndex = htmlData.indexOf(END_FRAGMENT);
     const wrap = document.createElement('div');
+
+    // FIXME: 최대 개수 제한 필요
     wrap.innerHTML = htmlData.slice(startIndex, endIndex);
   
     const stack: PasteStackItem[] = [...wrap.childNodes].map(node => nodeToStackItem(node));
