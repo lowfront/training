@@ -175,8 +175,34 @@ namespace Transform {
       }
     })
   }
-  export function deepSplit(parent: Node, targetText: Text, offset: number) {
-    const splitedText = targetText.splitText(offset);
+
+  function getDeepOffsetText(node: Node, offset: number) {
+    const initOffset = offset;
+    const stack: Node[] = [node];
+    let target: Node|undefined;
+    while (target = stack.shift()) {
+      if (isText(target)) {
+        if (target.data.length < offset) {
+          offset -= target.data.length;
+        } else {
+          break;
+        }
+      } else {
+        stack.unshift(...[...target.childNodes]);
+      }
+    }
+    if (!target) throw new Error(`Invalid offset: ${initOffset}`);
+
+    return {
+      node: target,
+      offset
+    };
+  }
+
+  export function deepSplitText(parent: Node, node: Node, offset: number) {
+    const { node: targetText, offset: offsetText } = getDeepOffsetText(node, offset);
+
+    const splitedText = (targetText as Text).splitText(offsetText);
     let target: Node = splitedText;
 
     let clonedParent: Node|null = null;
