@@ -116,6 +116,7 @@ namespace Transform {
     }
   }
 
+  // FIXME: b, i로 스타일링된 링크 텍스트 삭제시 href 업데이트 되지 않는 버그 있음
   export function deleteTransform(input: HTMLElement, ev: InputEvent) {
     const selection = Editor.getSelection();
     const { anchorNode, anchorOffset } = selection;
