@@ -36,7 +36,7 @@ namespace Transform {
     }
 
     if (isText(anchorNode) && !isWrappedInTag(anchorNode, 'a')) {
-      const textNodes = Parser.getConnectedTextNodes(paragraph, anchorNode);
+      const textNodes = Parser.getConnectedTextNodesExceptLink(paragraph, anchorNode);
       const textContent = textNodes.reduce((acc, { data }) => acc + data, '');
       console.log('textContent', textContent);
       const matchArray = textContent.match(RegexHttp);
@@ -68,18 +68,18 @@ namespace Transform {
       console.log('linkStart', linkStart.data, linkStartOffset);
       console.log('linkEnd', linkEnd.data, linkEndOffset);
       
-      const startSplitedNodeArray = deepSplit(paragraph, linkStart, linkStartOffset);
+      const startSplitedNodeArray = deepSplitText(paragraph, linkStart, linkStartOffset);
+      console.log('startSplitedNodeArray', startSplitedNodeArray)
 
       if (linkStart === linkEnd) {
         console.log('same link node')
         linkEnd = startSplitedNodeArray[0] as Text;
         linkEndOffset = linkText.length;
       }
-      console.log('linkEnd2', linkEnd.data, linkEndOffset);
+      console.log('linkEnd2', linkEnd, linkEnd.data, linkEndOffset);
 
-      const endSplitedNodeArray = deepSplit(paragraph, linkEnd, linkEndOffset);
+      const endSplitedNodeArray = deepSplitText(paragraph, linkEnd, linkEndOffset);
 
-      console.log('startSplitedNodeArray', startSplitedNodeArray)
       console.log('endSplitedNodeArray', endSplitedNodeArray)
       const linkChildNodes = startSplitedNodeArray.filter(item => !endSplitedNodeArray.includes(item));
 
