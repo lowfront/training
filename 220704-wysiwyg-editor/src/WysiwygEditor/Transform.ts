@@ -13,9 +13,6 @@ namespace Transform {
     }
   }
 
-  export const RegexHttp =
-    /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
-
   export function linkTransform(input: HTMLElement, ev: InputEvent) {
     const selection = Editor.getSelection();
     const { anchorNode, anchorOffset } = selection;
