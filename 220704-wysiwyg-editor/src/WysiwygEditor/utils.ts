@@ -213,3 +213,13 @@ export function removeIfEmpty(root: Node, node: Node) {
     node = node.parentNode!;
   }
 }
+
+export function validAnchorElement(anchorElement: HTMLAnchorElement) {
+  if (RegexHttp.test(anchorElement.textContent ?? '')) {
+    anchorElement.href = anchorElement.textContent!;
+  } else  {
+    const anchorParent = anchorElement.parentNode!;
+    [...anchorElement.childNodes].forEach(node => anchorParent.insertBefore(node, anchorElement));
+    anchorParent.removeChild(anchorElement);
+  }
+}

@@ -1,6 +1,6 @@
 import Editor from "./Editor";
 import Parser from "./Parser";
-import { findPreviousSiblingDeep, getChildNodes, getLastChildNode, insertAfter, isHTML, isText, isWrappedInTag, previousSiblingTextDeep, removeIfEmpty } from "./utils";
+import { findPreviousSiblingDeep, getChildNodes, getLastChildNode, getWrappedInTag, insertAfter, isHTML, isText, isWrappedInTag, previousSiblingTextDeep, RegexHttp, removeIfEmpty, validAnchorElement } from "./utils";
 
 namespace Transform {
   export function initWrap(input: HTMLElement) {
@@ -104,7 +104,15 @@ namespace Transform {
     let focusOffset: number = -1;
 
     /* a tag cleanup after enter */
+    const previousAnchor = findPreviousSiblingDeep(input, anchorNode, node => isHTML(node, 'a'));
+    if (previousAnchor) {
+      validAnchorElement(previousAnchor as HTMLAnchorElement);
+    }
+
     const wrappedAnchor = getWrappedInTag(input, anchorNode, 'a');
+    if (wrappedAnchor) {
+      validAnchorElement(wrappedAnchor);
+    }
   }
 
   export function deleteTransform(input: HTMLElement, ev: InputEvent) {
