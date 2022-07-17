@@ -47,7 +47,6 @@ namespace Parser {
   // FIXME: 가드 처리 위치 고민 필요
   function getTextNodesConnectedPrevious(parent: HTMLElement, cursorNode: Text) {
     if (cursorNode.data[0] === ' ') return [];
-    if (findPreviousSiblingDeep(parent, cursorNode, node => isHTML(node, 'a'))) return [];
 
     const stack: Node[] = [cursorNode];
     const result = [];
@@ -84,7 +83,6 @@ namespace Parser {
   // FIXME: 가드 처리 위치 고민 필요
   function getTextNodesConnectedNext(parent: HTMLElement, cursorNode: Text) {
     if (cursorNode.data[cursorNode.data.length - 1] === ' ') return [];
-    if (findNextSiblingDeep(parent, cursorNode, node => isHTML(node, 'a'))) return [];
 
     const stack: Node[] = [cursorNode];
     const result = [];
@@ -118,11 +116,22 @@ namespace Parser {
     return result;
   }
 
-  export function getConnectedTextNodes(parent: HTMLElement, cursorNode: Text) {
+  function isDeepPreviousAnchor(parent: HTMLElement, cursorNode: Text) {
+    return findPreviousSiblingDeep(parent, cursorNode, node => isHTML(node, 'a'))
+  }
+
+  function isDeepNextAnchor(parent: HTMLElement, cursorNode: Text) {
+    return findNextSiblingDeep(parent, cursorNode, node => isHTML(node, 'a'))
+  }
+
+  export function getConnectedTextNodesExceptLink(parent: HTMLElement, cursorNode: Text) {
+    const previousConnectedTextNodes = isDeepPreviousAnchor(parent, cursorNode) ? [] : getTextNodesConnectedPrevious(parent, cursorNode);
+    const nextConnectedTextNodes = isDeepNextAnchor(parent, cursorNode) ? [] : getTextNodesConnectedNext(parent, cursorNode);
+
     const result = [
-      ...getTextNodesConnectedPrevious(parent, cursorNode),
+      ...previousConnectedTextNodes,
       cursorNode,
-      ...getTextNodesConnectedNext(parent, cursorNode)
+      ...nextConnectedTextNodes,
     ];
 
     return result;
