@@ -2,6 +2,7 @@ import Parser from "./Parser";
 import Transform from "./Transform";
 import "./index.css";
 import Editor from "./Editor";
+import { getWrappedInTag, isHTML } from "./utils";
 
 namespace WysiwygEditor {
   function handleKeyDown(input: HTMLElement, ev: InputEvent) {
@@ -22,6 +23,17 @@ namespace WysiwygEditor {
   }
   function handleKeyUp(input: HTMLElement, ev: KeyboardEvent) {}
 
+  // FIXME: click handler 주입식으로 변경
+  function handleClick(input: HTMLElement, ev: MouseEvent) {
+    const node = ev.target as Node;
+    const a = isHTML(node, 'a') ? node : getWrappedInTag(input, node, 'a');
+
+    if (a) {
+      window.open(a.href, '_blank');
+    }
+  }
+
+
   function createHandleKeyDown(input: HTMLElement) {
     return handleKeyDown.bind(null, input);
   }
@@ -33,10 +45,16 @@ namespace WysiwygEditor {
   function createHandlePaste(input: HTMLElement) {
     return (ev: ClipboardEvent) => {};
   }
+  function createHandleClick(input: HTMLElement) {
+    return handleClick.bind(null, input);
+  }
+
 
   export function create(input: HTMLElement) {
     input.className = "wysiwyg-editor";
     input.contentEditable = "true";
+
+    input.addEventListener('click', createHandleClick(input));
 
     Transform.initWrap(input);
 
