@@ -1,6 +1,5 @@
 export const RegexHttp = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
 
-
 export function isHTML<K extends keyof HTMLElementTagNameMap>(
   node: Node | null,
   tagName: K

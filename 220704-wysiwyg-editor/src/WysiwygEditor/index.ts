@@ -1,7 +1,5 @@
-import Parser from "./Parser";
 import Transform from "./Transform";
 import "./index.css";
-import Editor from "./Editor";
 import { getWrappedInTag, isHTML } from "./utils";
 
 namespace WysiwygEditor {
@@ -32,7 +30,6 @@ namespace WysiwygEditor {
       window.open(a.href, '_blank');
     }
   }
-
 
   function createHandleKeyDown(input: HTMLElement) {
     return handleKeyDown.bind(null, input);

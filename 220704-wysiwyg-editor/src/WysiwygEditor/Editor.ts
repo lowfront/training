@@ -1,5 +1,5 @@
 import Parser from "./Parser";
-import { getChildNodes, isHTML, isText } from "./utils";
+import { getChildNodes, isText } from "./utils";
 
 namespace Editor {
   export function getSelection() {
