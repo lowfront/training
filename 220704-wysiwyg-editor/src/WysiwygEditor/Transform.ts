@@ -24,8 +24,8 @@ namespace Transform {
       if (RegexHttp.test(a.textContent + anchorNode.data)) {
         const char = anchorNode.splitText(0);
         const textNode = previousSiblingTextDeep(paragraph,anchorNode) as Text;
-        console.log(textNode, char);
         textNode.data += char.data;
+        a.href = textNode.data;
         char.remove();
 
         return;
