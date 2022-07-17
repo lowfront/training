@@ -2,7 +2,7 @@ import Transform from "./Transform";
 import "./index.css";
 import { getWrappedInTag, isHTML } from "./utils";
 
-namespace WysiwygEditor {
+namespace WysiwygEditor {  
   function handleKeyDown(input: HTMLElement, ev: InputEvent) {
     if (ev.inputType === "insertParagraph") {
       Transform.cleanEmpty(input);
@@ -31,6 +31,10 @@ namespace WysiwygEditor {
     }
   }
 
+  function handlePaste(input: HTMLElement, ev: ClipboardEvent) {
+    Transform.pasteTransform(input, ev);
+  }
+
   function createHandleKeyDown(input: HTMLElement) {
     return handleKeyDown.bind(null, input);
   }
@@ -40,7 +44,7 @@ namespace WysiwygEditor {
   }
 
   function createHandlePaste(input: HTMLElement) {
-    return (ev: ClipboardEvent) => {};
+    return handlePaste.bind(null, input);
   }
   function createHandleClick(input: HTMLElement) {
     return handleClick.bind(null, input);
@@ -59,9 +63,17 @@ namespace WysiwygEditor {
     const handleKeyUp = createHandleKeyUp(input);
     const handlePaste = createHandlePaste(input);
 
-    input.addEventListener("input", handleKeyDown as any);
+    let isPaste = false;
+    input.addEventListener("input", ev => {
+      if (isPaste) return;
+      handleKeyDown(ev as InputEvent);
+    });
     input.addEventListener("keyup", handleKeyUp);
-    input.addEventListener("paste", handlePaste);
+    input.addEventListener("paste", ev => {
+      isPaste = true;
+      handlePaste(ev);
+      isPaste = false;
+    });
 
     return function destory() {
       input.removeEventListener("input", handleKeyDown as any);
