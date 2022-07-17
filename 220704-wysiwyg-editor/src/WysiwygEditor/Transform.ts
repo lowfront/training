@@ -32,7 +32,7 @@ namespace Transform {
       }
     }
 
-    if (isText(anchorNode) && !isWrappedInTag(anchorNode, 'a')) {
+    if (isText(anchorNode) && !isWrappedInTag(paragraph, anchorNode, 'a')) {
       const textNodes = Parser.getConnectedTextNodesExceptLink(paragraph, anchorNode);
       const textContent = textNodes.reduce((acc, { data }) => acc + data, '');
       console.log('textContent', textContent);

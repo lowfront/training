@@ -191,8 +191,8 @@ export function insertAfter(node: Node, child: Node, parent: Node = child.parent
   }
 }
 
-export function isWrappedInTag(node: Node, tagName: string) {
-  while (node) {
+export function isWrappedInTag(root: Node, node: Node, tagName: string) {
+  while (node && node !== root) {
     if ((node.parentNode as HTMLElement)?.tagName === tagName.toUpperCase()) return true;
     node = node.parentNode!;
   }
