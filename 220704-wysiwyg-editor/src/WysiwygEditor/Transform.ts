@@ -104,6 +104,7 @@ namespace Transform {
     let focusOffset: number = -1;
 
     /* a tag cleanup after enter */
+    const wrappedAnchor = getWrappedInTag(input, anchorNode, 'a');
   }
 
   export function deleteTransform(input: HTMLElement, ev: InputEvent) {

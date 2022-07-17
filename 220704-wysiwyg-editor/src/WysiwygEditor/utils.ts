@@ -198,6 +198,13 @@ export function isWrappedInTag(root: Node, node: Node, tagName: string) {
   }
   return false;
 }
+export function getWrappedInTag<K extends keyof HTMLElementTagNameMap>(root: Node, node: Node, tagName: K) {
+  while (node && node !== root) {
+    if ((node.parentNode as HTMLElement)?.tagName === tagName.toUpperCase()) return node.parentNode as HTMLElementTagNameMap[K];
+    node = node.parentNode!;
+  }
+  return null;
+}
 
 export function removeIfEmpty(root: Node, node: Node) {
   while (node && node !== root) {
