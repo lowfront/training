@@ -199,8 +199,8 @@ export function isWrappedInTag(root: Node, node: Node, tagName: string) {
   return false;
 }
 
-export function removeIfEmpty(parent: Node, node: Node) {
-  while (node && node !== parent) {
+export function removeIfEmpty(root: Node, node: Node) {
+  while (node && node !== root) {
     if (node.firstChild) break;
     node.parentNode!.removeChild(node);
     node = node.parentNode!;
