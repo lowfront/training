@@ -5,9 +5,10 @@ import Editor from "./Editor";
 
 namespace WysiwygEditor {
   function handleKeyDown(input: HTMLElement, ev: InputEvent) {
-    Transform.cleanEmpty(input);
-    if (ev.inputType === "insertParagraph") Transform.enterTransform(input, ev);
-    else if (
+    if (ev.inputType === "insertParagraph") {
+      Transform.cleanEmpty(input);
+      Transform.enterTransform(input, ev);
+    } else if (
       ev.inputType === "deleteContentBackward" ||
       ev.inputType === "deleteContentForward" ||
       ev.inputType === "deleteWordForward" ||
