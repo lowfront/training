@@ -223,18 +223,21 @@ namespace Transform {
     const result: PasteStackItem[][] = [[]];
     let target: PasteStackItem|undefined;
     
+    console.log(wrap.innerHTML);
+
     while (target = stack.shift()) {
       const { node } = target;
-      if (node.nodeType === 1) {
+      if (isText(node)) {
+        result[result.length - 1].push(Object.assign(target, {style: ''}));
+      } else if (blockTags.includes((node as HTMLElement).tagName ?? '') && ![...node.childNodes].length) {
+        result.push([]);
+      } else {
         if (target.block && result[result.length - 1].length) result.push([]);
-        
         
         const items = [...node.childNodes].map(nodeChild => {
           return nodeToStackItem(nodeChild, target);
         });
         stack.unshift(...items);
-      } else {
-        result[result.length - 1].push(Object.assign(target, {style: ''}));
       }
     }
     console.log(result);
