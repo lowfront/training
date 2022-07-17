@@ -16,7 +16,7 @@ namespace Transform {
   export function linkTransform(input: HTMLElement, ev: InputEvent) {
     const selection = Editor.getSelection();
     const { anchorNode, anchorOffset } = selection;
-    
+
     const paragraph = Parser.getCurrentParagraph(input, anchorNode);
     const a = findPreviousSiblingDeep(paragraph, anchorNode, node => isHTML(node, 'a')) as HTMLAnchorElement|null;
     if (isText(anchorNode) && !/^\s$/.test(anchorNode.data) && anchorNode.data.length === 1 && a) {
@@ -38,9 +38,10 @@ namespace Transform {
 
       const matchArray = textContent.match(RegexHttp);
       if (!matchArray) return;
-
+      // console.log('[matchArray]', matchArray, anchorNode, anchorOffset);
       const { 0: linkText, index } = matchArray as RegExpMatchArray & { index: number };
-
+      const focusOffset = textContent.indexOf(anchorNode.data) - index + anchorOffset; // textContent에서 anchorNode가 시작하는 위치에서 link 시작부분을 빼면 anchorNode와 같은 offset을 갖게 됨. 이를 더해서 링크에서 focusOffset을 구할 수 있음
+      
       let length = index;
       let linkStart!: Text;
       let linkStartOffset!: number;
@@ -90,7 +91,7 @@ namespace Transform {
       linkChildNodes.forEach(node => a.appendChild(node));
 
       console.log('[anchorNode]', anchorNode);
-      Editor.deepFocus(a, a.textContent!.length);
+      Editor.deepFocus(a, focusOffset);
     }
   }
 
