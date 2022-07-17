@@ -91,6 +91,9 @@ namespace Transform {
       a.href = linkChildNodes.reduce((acc, { textContent }) => acc + textContent, '');
       paragraph.insertBefore(a, linkChildNodes[0]);
       linkChildNodes.forEach(node => a.appendChild(node));
+
+      console.log('[anchorNode]', anchorNode);
+      Editor.deepFocus(a, a.textContent!.length);
     }
   }
 

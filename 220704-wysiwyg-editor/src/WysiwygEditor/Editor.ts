@@ -1,3 +1,4 @@
+import Parser from "./Parser";
 import { getChildNodes, isHTML, isText } from "./utils";
 
 namespace Editor {
@@ -17,6 +18,11 @@ namespace Editor {
     range.collapse(true);
     selection.removeAllRanges();
     selection.addRange(range);
+  }
+
+  export function deepFocus(node: Node, offset: number) {
+    const { node: targetNode, offset: targetOffset } = Parser.getDeepOffsetText(node, offset);
+    Editor.focus(targetNode, targetOffset);
   }
 
   export function appendParagraph(
