@@ -1,4 +1,3 @@
-import Editor from "./Editor";
 import { findPreviousSiblingDeep, getChildNodes, getLastChildNode, isHTML, isText, findNextSiblingDeep } from "./utils";
 
 namespace Parser {
@@ -135,6 +134,29 @@ namespace Parser {
     ];
 
     return result;
+  }
+
+  export function getDeepOffsetText(node: Node, offset: number) {
+    const initOffset = offset;
+    const stack: Node[] = [node];
+    let target: Node|undefined;
+    while (target = stack.shift()) {
+      if (isText(target)) {
+        if (target.data.length < offset) {
+          offset -= target.data.length;
+        } else {
+          break;
+        }
+      } else {
+        stack.unshift(...[...target.childNodes]);
+      }
+    }
+    if (!target) throw new Error(`Invalid offset: ${initOffset}`);
+
+    return {
+      node: target,
+      offset
+    };
   }
 }
 
